@@ -6,7 +6,7 @@
 -- 1. TABEL PENGATURAN SITUS (site_settings)
 CREATE TABLE IF NOT EXISTS site_settings (
  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
- couple_names TEXT NOT NULL DEFAULT 'Wahyu & Elena',
+ couple_names TEXT NOT NULL DEFAULT 'Wahyu & Nur',
  relationship_start_date DATE NOT NULL DEFAULT '2023-10-24',
  hero_title TEXT DEFAULT 'Di antara dua orang asing, kita menjadi kita.',
  hero_subtitle TEXT DEFAULT 'Ruang digital dokumentasi perjalanan cinta berdua.',
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS timeline_events (
 CREATE TABLE IF NOT EXISTS love_notes (
  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
  letter_content TEXT NOT NULL,
- signature_names TEXT DEFAULT 'Wahyu & Elena'
+ signature_names TEXT DEFAULT 'Wahyu & Nur'
 );
 
 -- ==============================================================================
@@ -108,7 +108,7 @@ INSERT INTO site_settings (
   admin_pin
 )
 SELECT 
-  'Wahyu & Elena', 
+  'Wahyu & Nur', 
   '2023-10-24', 
   'Di antara dua orang asing, kita menjadi kita.', 
   'Ruang digital dokumentasi perjalanan cinta berdua.',
@@ -123,5 +123,5 @@ SELECT
   'Dulu aku berpikir bahwa cinta adalah sesuatu yang bising dan riuh—seperti kembang api yang meledak di langit kota yang ramai. Namun bersamamu, aku menyadari bahwa cinta sejati justru bersemayam dalam keheningan yang tenang. Cinta hadir dalam denting cangkir kopi di pagi hari, dalam caramu memandang dunia dengan kelembutan, dan dalam keyakinan bahwa apa pun yang terjadi esok, kita akan menghadapinya berdua.
 
 Terima kasih telah menjadi dermaga yang teduh, teman percakapan tengah malam favoritku, dan rumah di setiap langkah hidupku. Jika hidup kita adalah ribuan buku di perpustakaan semesta, aku akan menghabiskan setiap waktu hanya untuk mencari rak di mana kisah kita berada.', 
-  'Wahyu & Elena'
+  'Wahyu & Nur'
 WHERE NOT EXISTS (SELECT 1 FROM love_notes);

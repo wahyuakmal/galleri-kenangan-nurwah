@@ -59,7 +59,7 @@ export const AdminLoginModal = () => {
               Panel Admin Pasangan
             </h3>
             <p className="text-xs text-warm-300/60 font-light mt-1 max-w-xs">
-              Akses dashboard terproteksi PIN dengan sesi <code className="text-champagne-300">sessionStorage</code>.
+              Masukkan PIN Admin untuk mengelola konten dan pengaturan website.
             </p>
           </div>
 
@@ -109,11 +109,11 @@ export const AdminLoginModal = () => {
             </button>
           </form>
 
-          {/* Default PIN note */}
+          {/* Secure access note without showing any password */}
           <div className="mt-6 pt-4 border-t border-white/10 text-center">
             <p className="text-[11px] text-warm-400/50 font-light flex items-center justify-center gap-1.5">
-              <KeyRound className="w-3 h-3 text-champagne-400/60" />
-              <span>PIN Default: <strong className="text-champagne-300/90 font-mono">semesta123</strong></span>
+              <Lock className="w-3 h-3 text-champagne-400/60" />
+              <span>Akses terenkripsi dan khusus untuk pemilik website</span>
             </p>
           </div>
         </motion.div>

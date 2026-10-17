@@ -104,13 +104,13 @@ export const LanguageProvider = ({ children }) => {
 
     return {
       partner1: names[0] || 'Wahyu',
-      partner2: names[1] || 'Elena',
+      partner2: names[1] || 'Nur',
       coupleNames: siteSettings?.couple_names || `${defaultCoupleConfig.partner1} & ${defaultCoupleConfig.partner2}`,
       anniversaryDate: siteSettings?.relationship_start_date || '2023-10-24',
       music: {
         audioSrc: siteSettings?.bg_music_url || defaultCoupleConfig.music.audioSrc,
         title: "Lagu Semesta Kita",
-        artist: siteSettings?.couple_names || "Wahyu & Elena"
+        artist: siteSettings?.couple_names || "Wahyu & Nur"
       }
     };
   }, [siteSettings]);
