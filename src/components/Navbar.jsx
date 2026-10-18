@@ -25,7 +25,7 @@ export const Navbar = ({ onReplayIntro, isAudioPlaying, onToggleAudio }) => {
 
   const scrollToSection = (id) => {
     setMobileMenuOpen(false);
-    const element = document.getElementById(id);
+    const element = document.getElementById(id) || (id === 'profile' ? document.getElementById('timeline') : null);
     if (element) {
       const yOffset = -70;
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
@@ -35,7 +35,7 @@ export const Navbar = ({ onReplayIntro, isAudioPlaying, onToggleAudio }) => {
 
   const navLinks = [
     { label: data.nav.story, target: 'story' },
-    { label: data.nav.timeline, target: 'timeline' },
+    { label: data.nav.profile || data.nav.timeline || '02 PROFIL PASANGAN', target: 'profile' },
     { label: data.nav.moments, target: 'moments' },
   ];
 

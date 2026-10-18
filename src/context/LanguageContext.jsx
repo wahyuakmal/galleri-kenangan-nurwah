@@ -38,7 +38,41 @@ export function mergeCoupleData(baseData, siteSettings, galleryPhotos, timelineE
       image2Caption: siteSettings.story_image2_caption || merged.story.image2Caption,
     };
 
-    // Timeline Section Header Overrides
+    // Profile Section (Section 02 - Profil Pasangan) Overrides
+    merged.profile = {
+      sectionNumber: "02",
+      sectionTitle: siteSettings.profile_section_title || merged.profile?.sectionTitle || "PROFIL PASANGAN",
+      subheading: siteSettings.profile_subheading || merged.profile?.subheading || "Dua insan berbeda dengan cerita masing-masing,\nyang dipertemukan untuk saling melengkapi.",
+      partner1: {
+        name: siteSettings.partner1_name || merged.profile?.partner1?.name || "Wahyu",
+        fullname: siteSettings.partner1_fullname || merged.profile?.partner1?.fullname || "Wahyu",
+        role: siteSettings.partner1_role || merged.profile?.partner1?.role || "Mempelai Pria",
+        bio: siteSettings.partner1_bio || merged.profile?.partner1?.bio || "Pribadi yang tenang, penuh dedikasi, dan selalu berusaha memberikan yang terbaik. Baginya, kebahagiaan terbesar adalah melihat senyum tulus terbit di wajah orang yang paling dicintainya.",
+        quote: siteSettings.partner1_quote || merged.profile?.partner1?.quote || "“Menemukanmu adalah takdir terindah yang selalu aku syukuri di setiap hembusan nafas.”",
+        birthdate: siteSettings.partner1_birthdate || merged.profile?.partner1?.birthdate || "Kampar, Riau",
+        instagram: siteSettings.partner1_instagram || merged.profile?.partner1?.instagram || "@wahyu",
+        photo: siteSettings.partner1_photo_url || merged.profile?.partner1?.photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop"
+      },
+      partner2: {
+        name: siteSettings.partner2_name || merged.profile?.partner2?.name || "Nur",
+        fullname: siteSettings.partner2_fullname || merged.profile?.partner2?.fullname || "Nur",
+        role: siteSettings.partner2_role || merged.profile?.partner2?.role || "Mempelai Wanita",
+        bio: siteSettings.partner2_bio || merged.profile?.partner2?.bio || "Sosok yang hangat, berhati lembut, dan senantiasa membawa keteduhan di setiap langkah. Kehadirannya adalah alasan mengapa rumah terasa begitu nyaman dan penuh tawa.",
+        quote: siteSettings.partner2_quote || merged.profile?.partner2?.quote || "“Di antara ramainya dunia, hatiku selalu tahu bahwa kamu adalah tempat paling aman untuk pulang.”",
+        birthdate: siteSettings.partner2_birthdate || merged.profile?.partner2?.birthdate || "Bangkinang, Riau",
+        instagram: siteSettings.partner2_instagram || merged.profile?.partner2?.instagram || "@nur",
+        photo: siteSettings.partner2_photo_url || merged.profile?.partner2?.photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
+      }
+    };
+
+    // Nav label for Section 02
+    merged.nav = {
+      ...merged.nav,
+      timeline: siteSettings.profile_section_title ? `02 ${siteSettings.profile_section_title}` : "02 PROFIL PASANGAN",
+      profile: siteSettings.profile_section_title ? `02 ${siteSettings.profile_section_title}` : "02 PROFIL PASANGAN"
+    };
+
+    // Timeline Section Header Overrides (Fallback)
     if (siteSettings.timeline_section_title) {
       merged.timeline.sectionTitle = siteSettings.timeline_section_title;
     }
@@ -144,15 +178,19 @@ export const LanguageProvider = ({ children }) => {
       .split(/&|dan|\+/i)
       .map(s => s.trim());
 
+    const p1 = siteSettings?.partner1_name || names[0] || 'Wahyu';
+    const p2 = siteSettings?.partner2_name || names[1] || 'Nur';
+    const coupleNames = siteSettings?.couple_names || `${p1} & ${p2}`;
+
     return {
-      partner1: names[0] || 'Wahyu',
-      partner2: names[1] || 'Nur',
-      coupleNames: siteSettings?.couple_names || `${defaultCoupleConfig.partner1} & ${defaultCoupleConfig.partner2}`,
+      partner1: p1,
+      partner2: p2,
+      coupleNames: coupleNames,
       anniversaryDate: siteSettings?.relationship_start_date || '2023-10-24',
       music: {
         audioSrc: siteSettings?.bg_music_url || defaultCoupleConfig.music.audioSrc,
         title: "Lagu Semesta Kita",
-        artist: siteSettings?.couple_names || "Wahyu & Nur"
+        artist: coupleNames
       }
     };
   }, [siteSettings]);

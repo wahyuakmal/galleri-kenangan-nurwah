@@ -16,6 +16,24 @@ const BASE_SETTINGS_COLUMNS = [
   'hero_image_url',
   'bg_music_url',
   'admin_pin',
+  'profile_section_title',
+  'profile_subheading',
+  'partner1_name',
+  'partner1_fullname',
+  'partner1_role',
+  'partner1_bio',
+  'partner1_quote',
+  'partner1_birthdate',
+  'partner1_instagram',
+  'partner1_photo_url',
+  'partner2_name',
+  'partner2_fullname',
+  'partner2_role',
+  'partner2_bio',
+  'partner2_quote',
+  'partner2_birthdate',
+  'partner2_instagram',
+  'partner2_photo_url',
   'updated_at'
 ];
 
@@ -204,6 +222,37 @@ export async function uploadStoryPhoto(file, slot = '1') {
   const fileExt = file.name.split('.').pop();
   const safeName = sanitizeFileName(file.name.replace(/\.[^/.]+$/, ''));
   const storagePath = `story/${Date.now()}_slot${slot}_${safeName}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('photos')
+    .upload(storagePath, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+
+  if (uploadError) {
+    throw uploadError;
+  }
+
+  const { data } = supabase.storage
+    .from('photos')
+    .getPublicUrl(storagePath);
+
+  return {
+    publicUrl: data.publicUrl,
+    storagePath
+  };
+}
+
+// Upload Foto Profil Pasangan ke Bucket 'photos'
+export async function uploadPartnerPhoto(file, partnerNum = '1') {
+  if (!isSupabaseConfigured) {
+    throw new Error('Supabase belum terkonfigurasi. Silakan isi .env terlebih dahulu.');
+  }
+
+  const fileExt = file.name.split('.').pop();
+  const safeName = sanitizeFileName(file.name.replace(/\.[^/.]+$/, ''));
+  const storagePath = `profile/partner${partnerNum}_${Date.now()}_${safeName}.${fileExt}`;
 
   const { error: uploadError } = await supabase.storage
     .from('photos')

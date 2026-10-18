@@ -29,7 +29,8 @@ export const coupleDataByLang = {
 
     nav: {
       story: "01 CERITA",
-      timeline: "02 LINIMASA",
+      timeline: "02 PROFIL PASANGAN",
+      profile: "02 PROFIL PASANGAN",
       moments: "03 MOMEN",
       prologue: "Prolog",
       replay: "Putar Ulang Prolog"
@@ -83,6 +84,32 @@ hari ketika dua orang yang tidak saling mengenal, akhirnya dipertemukan.`,
       image2Caption: "Tatap mata pertama di tengah gerimis",
       coordinates: "40°42'46.1\"N 74°00'21.8\"W",
       archiveText: "Tersimpan dalam arsip kenangan kita"
+    },
+
+    profile: {
+      sectionNumber: "02",
+      sectionTitle: "PROFIL PASANGAN",
+      subheading: "Dua insan berbeda dengan cerita masing-masing,\nyang dipertemukan untuk saling melengkapi.",
+      partner1: {
+        name: "Wahyu",
+        fullname: "Wahyu",
+        role: "Mempelai Pria",
+        bio: "Pribadi yang tenang, penuh dedikasi, dan selalu berusaha memberikan yang terbaik. Baginya, kebahagiaan terbesar adalah melihat senyum tulus terbit di wajah orang yang paling dicintainya.",
+        quote: "“Menemukanmu adalah takdir terindah yang selalu aku syukuri di setiap hembusan nafas.”",
+        birthdate: "Kampar, Riau",
+        instagram: "@wahyu",
+        photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop"
+      },
+      partner2: {
+        name: "Nur",
+        fullname: "Nur",
+        role: "Mempelai Wanita",
+        bio: "Sosok yang hangat, berhati lembut, dan senantiasa membawa keteduhan di setiap langkah. Kehadirannya adalah alasan mengapa rumah terasa begitu nyaman dan penuh tawa.",
+        quote: "“Di antara ramainya dunia, hatiku selalu tahu bahwa kamu adalah tempat paling aman untuk pulang.”",
+        birthdate: "Bangkinang, Riau",
+        instagram: "@nur",
+        photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
+      }
     },
 
     timeline: {

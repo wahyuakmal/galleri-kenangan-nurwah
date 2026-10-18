@@ -31,9 +31,30 @@ Kisah kita bersemi di antara kebetulan dan takdir.',
   story_image2_url TEXT,
   story_image2_caption TEXT DEFAULT 'Tatap mata pertama di tengah gerimis',
 
-  -- Timeline Section Header
-  timeline_section_title TEXT DEFAULT 'LINIMASA KITA',
-  timeline_subheading TEXT DEFAULT 'Momen-momen kecil yang perlahan merangkai kisah kita.',
+  -- Profil Pasangan (Section 02)
+  profile_section_title TEXT DEFAULT 'PROFIL PASANGAN',
+  profile_subheading TEXT DEFAULT 'Dua insan berbeda dengan cerita masing-masing, yang dipertemukan untuk saling melengkapi.',
+  partner1_name TEXT DEFAULT 'Wahyu',
+  partner1_fullname TEXT DEFAULT 'Wahyu',
+  partner1_role TEXT DEFAULT 'Mempelai Pria',
+  partner1_bio TEXT DEFAULT 'Pribadi yang tenang, penuh dedikasi, dan selalu berusaha memberikan yang terbaik. Baginya, kebahagiaan terbesar adalah melihat senyum tulus terbit di wajah orang yang paling dicintainya.',
+  partner1_quote TEXT DEFAULT '“Menemukanmu adalah takdir terindah yang selalu aku syukuri di setiap hembusan nafas.”',
+  partner1_birthdate TEXT DEFAULT 'Kampar, Riau',
+  partner1_instagram TEXT DEFAULT '@wahyu',
+  partner1_photo_url TEXT,
+
+  partner2_name TEXT DEFAULT 'Nur',
+  partner2_fullname TEXT DEFAULT 'Nur',
+  partner2_role TEXT DEFAULT 'Mempelai Wanita',
+  partner2_bio TEXT DEFAULT 'Sosok yang hangat, berhati lembut, dan senantiasa membawa keteduhan di setiap langkah. Kehadirannya adalah alasan mengapa rumah terasa begitu nyaman dan penuh tawa.',
+  partner2_quote TEXT DEFAULT '“Di antara ramainya dunia, hatiku selalu tahu bahwa kamu adalah tempat paling aman untuk pulang.”',
+  partner2_birthdate TEXT DEFAULT 'Bangkinang, Riau',
+  partner2_instagram TEXT DEFAULT '@nur',
+  partner2_photo_url TEXT,
+
+  -- Timeline Section Header (Opsional / Legacy)
+  timeline_section_title TEXT DEFAULT 'PROFIL PASANGAN',
+  timeline_subheading TEXT DEFAULT 'Dua insan berbeda dengan cerita masing-masing, yang dipertemukan untuk saling melengkapi.',
 
   -- Final Section / Footer
   final_quote TEXT DEFAULT '“Dan ini hanyalah sebuah permulaan.”',
@@ -69,8 +90,29 @@ ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS story_image1_caption TEXT;
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS story_image2_url TEXT;
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS story_image2_caption TEXT;
 
-ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS timeline_section_title TEXT DEFAULT 'LINIMASA KITA';
-ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS timeline_subheading TEXT DEFAULT 'Momen-momen kecil yang perlahan merangkai kisah kita.';
+-- Profil Pasangan Migrations
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS profile_section_title TEXT DEFAULT 'PROFIL PASANGAN';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS profile_subheading TEXT DEFAULT 'Dua insan berbeda dengan cerita masing-masing, yang dipertemukan untuk saling melengkapi.';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner1_name TEXT DEFAULT 'Wahyu';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner1_fullname TEXT DEFAULT 'Wahyu';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner1_role TEXT DEFAULT 'Mempelai Pria';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner1_bio TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner1_quote TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner1_birthdate TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner1_instagram TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner1_photo_url TEXT;
+
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner2_name TEXT DEFAULT 'Nur';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner2_fullname TEXT DEFAULT 'Nur';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner2_role TEXT DEFAULT 'Mempelai Wanita';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner2_bio TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner2_quote TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner2_birthdate TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner2_instagram TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS partner2_photo_url TEXT;
+
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS timeline_section_title TEXT DEFAULT 'PROFIL PASANGAN';
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS timeline_subheading TEXT DEFAULT 'Dua insan berbeda dengan cerita masing-masing, yang dipertemukan untuk saling melengkapi.';
 
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS final_quote TEXT;
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS final_subtext TEXT;

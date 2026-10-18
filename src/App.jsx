@@ -9,7 +9,7 @@ import OpeningCinematic from './components/OpeningCinematic';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import StorySection from './components/StorySection';
-import TimelineSection from './components/TimelineSection';
+import ProfileSection from './components/ProfileSection';
 import MomentsSection from './components/MomentsSection';
 import LoveLetterSection from './components/LoveLetterSection';
 import FinalSection from './components/FinalSection';
@@ -86,8 +86,8 @@ function MainUniverse() {
           {/* Section 01: HOW IT STARTED */}
           <StorySection />
 
-          {/* Section 02: OUR TIMELINE */}
-          <TimelineSection />
+          {/* Section 02: PROFIL PASANGAN */}
+          <ProfileSection />
 
           {/* Section 03: LITTLE MOMENTS */}
           <MomentsSection />

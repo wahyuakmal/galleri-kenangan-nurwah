@@ -3,6 +3,7 @@ import {
   getSiteSettings, 
   updateSiteSettings, 
   uploadHeroPhoto,
+  uploadPartnerPhoto,
   uploadStoryPhoto,
   uploadTimelinePhoto,
   uploadBgMusic,
@@ -38,7 +39,7 @@ export const AdminProvider = ({ children }) => {
   // Modal display states
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
-  const [activeDashboardTab, setActiveDashboardTab] = useState('gallery'); // 'gallery' | 'hero' | 'story' | 'timeline' | 'letter' | 'security'
+  const [activeDashboardTab, setActiveDashboardTab] = useState('gallery'); // 'gallery' | 'hero' | 'story' | 'profile' | 'letter' | 'security'
   const [editTargetData, setEditTargetData] = useState(null);
 
   // 2. Supabase Dynamic Data States with complete default values
@@ -69,9 +70,30 @@ export const AdminProvider = ({ children }) => {
     story_image2_url: coupleDataByLang.id.story.image2,
     story_image2_caption: coupleDataByLang.id.story.image2Caption,
 
-    // Timeline Header
-    timeline_section_title: coupleDataByLang.id.timeline.sectionTitle,
-    timeline_subheading: coupleDataByLang.id.timeline.subheading,
+    // Profil Pasangan (Section 02)
+    profile_section_title: coupleDataByLang.id.profile?.sectionTitle || 'PROFIL PASANGAN',
+    profile_subheading: coupleDataByLang.id.profile?.subheading || 'Dua insan berbeda dengan cerita masing-masing, yang dipertemukan untuk saling melengkapi.',
+    partner1_name: coupleDataByLang.id.profile?.partner1?.name || 'Wahyu',
+    partner1_fullname: coupleDataByLang.id.profile?.partner1?.fullname || 'Wahyu',
+    partner1_role: coupleDataByLang.id.profile?.partner1?.role || 'Mempelai Pria',
+    partner1_bio: coupleDataByLang.id.profile?.partner1?.bio || 'Pribadi yang tenang, penuh dedikasi, dan selalu berusaha memberikan yang terbaik. Baginya, kebahagiaan terbesar adalah melihat senyum tulus terbit di wajah orang yang paling dicintainya.',
+    partner1_quote: coupleDataByLang.id.profile?.partner1?.quote || '“Menemukanmu adalah takdir terindah yang selalu aku syukuri di setiap hembusan nafas.”',
+    partner1_birthdate: coupleDataByLang.id.profile?.partner1?.birthdate || 'Kampar, Riau',
+    partner1_instagram: coupleDataByLang.id.profile?.partner1?.instagram || '@wahyu',
+    partner1_photo_url: coupleDataByLang.id.profile?.partner1?.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop',
+
+    partner2_name: coupleDataByLang.id.profile?.partner2?.name || 'Nur',
+    partner2_fullname: coupleDataByLang.id.profile?.partner2?.fullname || 'Nur',
+    partner2_role: coupleDataByLang.id.profile?.partner2?.role || 'Mempelai Wanita',
+    partner2_bio: coupleDataByLang.id.profile?.partner2?.bio || 'Sosok yang hangat, berhati lembut, dan senantiasa membawa keteduhan di setiap langkah. Kehadirannya adalah alasan mengapa rumah terasa begitu nyaman dan penuh tawa.',
+    partner2_quote: coupleDataByLang.id.profile?.partner2?.quote || '“Di antara ramainya dunia, hatiku selalu tahu bahwa kamu adalah tempat paling aman untuk pulang.”',
+    partner2_birthdate: coupleDataByLang.id.profile?.partner2?.birthdate || 'Bangkinang, Riau',
+    partner2_instagram: coupleDataByLang.id.profile?.partner2?.instagram || '@nur',
+    partner2_photo_url: coupleDataByLang.id.profile?.partner2?.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop',
+
+    // Timeline Header (Fallback)
+    timeline_section_title: coupleDataByLang.id.timeline?.sectionTitle || 'PROFIL PASANGAN',
+    timeline_subheading: coupleDataByLang.id.timeline?.subheading || '',
 
     // Final Section
     final_quote: coupleDataByLang.id.final.quote,
@@ -206,6 +228,11 @@ export const AdminProvider = ({ children }) => {
     return res;
   };
 
+  const uploadPartner = async (file, partnerNum = '1') => {
+    const res = await uploadPartnerPhoto(file, partnerNum);
+    return res;
+  };
+
   const uploadTimeline = async (file) => {
     const res = await uploadTimelinePhoto(file);
     return res;
@@ -311,10 +338,11 @@ export const AdminProvider = ({ children }) => {
 
   const openDashboardModal = (tab = 'gallery', targetData = null) => {
     // Aliases for tabs
-    const validTabs = ['gallery', 'hero', 'settings', 'story', 'timeline', 'letter', 'security'];
+    const validTabs = ['gallery', 'hero', 'settings', 'story', 'profile', 'timeline', 'letter', 'security'];
     let resolvedTab = tab;
     if (tab === 'moments') resolvedTab = 'gallery';
     if (tab === 'settings') resolvedTab = 'hero';
+    if (tab === 'timeline') resolvedTab = 'profile';
     if (tab === 'story-final') resolvedTab = 'letter';
     if (!validTabs.includes(resolvedTab)) resolvedTab = 'gallery';
 
@@ -339,6 +367,7 @@ export const AdminProvider = ({ children }) => {
         saveSiteSettings,
         uploadHero,
         uploadStory,
+        uploadPartner,
         uploadTimeline,
         uploadAudio,
         galleryPhotos,

@@ -4,7 +4,7 @@ import {
   X, Image as ImageIcon, Plus, Trash2, Edit3, Upload, Check, AlertCircle, 
   RotateCcw, Sparkles, Calendar, MapPin, KeyRound, ShieldAlert,
   Layers, Bookmark, FileText, ArrowRight, Music, Heart, Loader2, Save,
-  Eye, EyeOff, BookOpen, Compass, Quote, MessageSquare
+  Eye, EyeOff, BookOpen, Compass, Quote, MessageSquare, User
 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -19,6 +19,7 @@ export const AdminDashboardModal = () => {
     saveSiteSettings,
     uploadHero,
     uploadStory,
+    uploadPartner,
     uploadTimeline,
     uploadAudio,
     galleryPhotos,
@@ -54,7 +55,7 @@ export const AdminDashboardModal = () => {
   const [photoPreview, setPhotoPreview] = useState('');
   const [photoStoragePath, setPhotoStoragePath] = useState('');
 
-  // Tab 2: Site Settings & Hero Form State
+  // Tab 2 & 3 & 4: Settings & Sections Form State
   const [settingsForm, setSettingsForm] = useState({
     couple_names: '',
     relationship_start_date: '',
@@ -81,9 +82,26 @@ export const AdminDashboardModal = () => {
     story_image2_url: '',
     story_image2_caption: '',
 
-    // Timeline Header
-    timeline_section_title: '',
-    timeline_subheading: '',
+    // Profil Pasangan (Section 02)
+    profile_section_title: '',
+    profile_subheading: '',
+    partner1_name: '',
+    partner1_fullname: '',
+    partner1_role: '',
+    partner1_bio: '',
+    partner1_quote: '',
+    partner1_birthdate: '',
+    partner1_instagram: '',
+    partner1_photo_url: '',
+
+    partner2_name: '',
+    partner2_fullname: '',
+    partner2_role: '',
+    partner2_bio: '',
+    partner2_quote: '',
+    partner2_birthdate: '',
+    partner2_instagram: '',
+    partner2_photo_url: '',
 
     // Final Section & Footer
     final_quote: '',
@@ -104,19 +122,11 @@ export const AdminDashboardModal = () => {
   const [story2File, setStory2File] = useState(null);
   const [story2Preview, setStory2Preview] = useState('');
 
-  // Tab 4: Timeline Form State
-  const [isAddingTimeline, setIsAddingTimeline] = useState(false);
-  const [editingTimelineId, setEditingTimelineId] = useState(null);
-  const [timelineForm, setTimelineForm] = useState({
-    year_or_date: '',
-    title: '',
-    description: '',
-    location: '',
-    image_url: '',
-    display_order: 0
-  });
-  const [timelineFile, setTimelineFile] = useState(null);
-  const [timelinePreview, setTimelinePreview] = useState('');
+  // Partner Profile Files Form State
+  const [partner1File, setPartner1File] = useState(null);
+  const [partner1Preview, setPartner1Preview] = useState('');
+  const [partner2File, setPartner2File] = useState(null);
+  const [partner2Preview, setPartner2Preview] = useState('');
 
   // Tab 5: Love Note & Final Form State
   const [noteForm, setNoteForm] = useState({
@@ -147,7 +157,8 @@ export const AdminDashboardModal = () => {
   const audioFileInputRef = useRef(null);
   const story1FileInputRef = useRef(null);
   const story2FileInputRef = useRef(null);
-  const timelineFileInputRef = useRef(null);
+  const partner1FileInputRef = useRef(null);
+  const partner2FileInputRef = useRef(null);
 
   // Synchronize initial values when modal opens or settings load
   useEffect(() => {
@@ -178,9 +189,26 @@ export const AdminDashboardModal = () => {
         story_image2_url: siteSettings.story_image2_url || data?.story?.image2 || '',
         story_image2_caption: siteSettings.story_image2_caption || data?.story?.image2Caption || '',
 
-        // Timeline Header
-        timeline_section_title: siteSettings.timeline_section_title || data?.timeline?.sectionTitle || 'LINIMASA KITA',
-        timeline_subheading: siteSettings.timeline_subheading || data?.timeline?.subheading || '',
+        // Profil Pasangan
+        profile_section_title: siteSettings.profile_section_title || data?.profile?.sectionTitle || 'PROFIL PASANGAN',
+        profile_subheading: siteSettings.profile_subheading || data?.profile?.subheading || 'Dua insan berbeda dengan cerita masing-masing, yang dipertemukan untuk saling melengkapi.',
+        partner1_name: siteSettings.partner1_name || data?.profile?.partner1?.name || 'Wahyu',
+        partner1_fullname: siteSettings.partner1_fullname || data?.profile?.partner1?.fullname || 'Wahyu',
+        partner1_role: siteSettings.partner1_role || data?.profile?.partner1?.role || 'Mempelai Pria',
+        partner1_bio: siteSettings.partner1_bio || data?.profile?.partner1?.bio || '',
+        partner1_quote: siteSettings.partner1_quote || data?.profile?.partner1?.quote || '',
+        partner1_birthdate: siteSettings.partner1_birthdate || data?.profile?.partner1?.birthdate || '',
+        partner1_instagram: siteSettings.partner1_instagram || data?.profile?.partner1?.instagram || '',
+        partner1_photo_url: siteSettings.partner1_photo_url || data?.profile?.partner1?.photo || '',
+
+        partner2_name: siteSettings.partner2_name || data?.profile?.partner2?.name || 'Nur',
+        partner2_fullname: siteSettings.partner2_fullname || data?.profile?.partner2?.fullname || 'Nur',
+        partner2_role: siteSettings.partner2_role || data?.profile?.partner2?.role || 'Mempelai Wanita',
+        partner2_bio: siteSettings.partner2_bio || data?.profile?.partner2?.bio || '',
+        partner2_quote: siteSettings.partner2_quote || data?.profile?.partner2?.quote || '',
+        partner2_birthdate: siteSettings.partner2_birthdate || data?.profile?.partner2?.birthdate || '',
+        partner2_instagram: siteSettings.partner2_instagram || data?.profile?.partner2?.instagram || '',
+        partner2_photo_url: siteSettings.partner2_photo_url || data?.profile?.partner2?.photo || '',
 
         // Final Section
         final_quote: siteSettings.final_quote || data?.final?.quote || '“Dan ini hanyalah sebuah permulaan.”',
@@ -189,9 +217,12 @@ export const AdminDashboardModal = () => {
         final_footer_text: siteSettings.final_footer_text || data?.final?.footerText || 'Dibuat dengan segenap cinta.',
         final_copyright: siteSettings.final_copyright || data?.final?.copyright || 'Our Little Universe • Terukir selamanya di dalam hati kita',
       });
+
       setHeroPreview(siteSettings.hero_image_url || data?.hero?.mainImage || '');
       setStory1Preview(siteSettings.story_image1_url || data?.story?.image1 || '');
       setStory2Preview(siteSettings.story_image2_url || data?.story?.image2 || '');
+      setPartner1Preview(siteSettings.partner1_photo_url || data?.profile?.partner1?.photo || '');
+      setPartner2Preview(siteSettings.partner2_photo_url || data?.profile?.partner2?.photo || '');
     }
 
     if (loveNote) {
@@ -209,11 +240,7 @@ export const AdminDashboardModal = () => {
     }
 
     if (editTargetData) {
-      if (editTargetData.year_or_date !== undefined) {
-        // Target is timeline item
-        startEditTimeline(editTargetData);
-      } else if (editTargetData.aspect_ratio !== undefined || editTargetData.image_url) {
-        // Target is photo
+      if (editTargetData.aspect_ratio !== undefined || editTargetData.image_url) {
         startEditPhoto(editTargetData);
       }
     }
@@ -358,7 +385,7 @@ export const AdminDashboardModal = () => {
 
       setHeroFile(null);
       setMusicFile(null);
-      showToast('Pengaturan situs & Hero berhasil disimpan!');
+      showToast('Pengaturan situs & Hero berhasil disimpan langsung!');
     } catch (err) {
       alert('Gagal menyimpan pengaturan: ' + err.message);
     } finally {
@@ -411,7 +438,7 @@ export const AdminDashboardModal = () => {
 
       setStory1File(null);
       setStory2File(null);
-      showToast('Kisah Pertemuan dan Foto berhasil disimpan!');
+      showToast('Kisah Pertemuan dan Foto berhasil disimpan langsung!');
     } catch (err) {
       alert('Gagal menyimpan kisah: ' + err.message);
     } finally {
@@ -420,84 +447,62 @@ export const AdminDashboardModal = () => {
   };
 
   // ==============================================================
-  // TAB 4: LINIMASA KISAH (TIMELINE) HANDLERS
+  // TAB 4: PROFIL PASANGAN (SECTION 02) HANDLERS
   // ==============================================================
-  const handleTimelineFileSelect = (e) => {
+  const handlePartner1FileSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setTimelineFile(file);
-    setTimelinePreview(URL.createObjectURL(file));
+    setPartner1File(file);
+    setPartner1Preview(URL.createObjectURL(file));
   };
 
-  const handleSaveTimeline = async (e) => {
+  const handlePartner2FileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPartner2File(file);
+    setPartner2Preview(URL.createObjectURL(file));
+  };
+
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      let finalImg = timelineForm.image_url;
+      let finalImg1 = settingsForm.partner1_photo_url;
+      let finalImg2 = settingsForm.partner2_photo_url;
 
-      if (timelineFile) {
-        const res = await uploadTimeline(timelineFile);
-        if (res?.publicUrl) finalImg = res.publicUrl;
+      if (partner1File) {
+        const res1 = await uploadPartner(partner1File, '1');
+        if (res1?.publicUrl) finalImg1 = res1.publicUrl;
       }
+
+      if (partner2File) {
+        const res2 = await uploadPartner(partner2File, '2');
+        if (res2?.publicUrl) finalImg2 = res2.publicUrl;
+      }
+
+      const p1 = settingsForm.partner1_name || 'Wahyu';
+      const p2 = settingsForm.partner2_name || 'Nur';
+      const coupleNames = `${p1} & ${p2}`;
 
       const payload = {
-        ...timelineForm,
-        image_url: finalImg
+        ...settingsForm,
+        couple_names: settingsForm.couple_names || coupleNames,
+        partner1_name: p1,
+        partner2_name: p2,
+        partner1_photo_url: finalImg1,
+        partner2_photo_url: finalImg2
       };
 
-      if (editingTimelineId) {
-        await updateTimeline(editingTimelineId, payload);
-        showToast('Milestone linimasa berhasil diperbarui!');
-      } else {
-        await addTimeline(payload);
-        showToast('Milestone linimasa baru berhasil ditambahkan!');
-      }
-
-      setIsAddingTimeline(false);
-      setEditingTimelineId(null);
-      setTimelineFile(null);
-      setTimelinePreview('');
-      setTimelineForm({
-        year_or_date: '',
-        title: '',
-        description: '',
-        location: '',
-        image_url: '',
-        display_order: timelineEvents.length + 1
-      });
-    } catch (err) {
-      alert('Gagal menyimpan milestone: ' + err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const startEditTimeline = (item) => {
-    setEditingTimelineId(item.id);
-    setTimelineForm({
-      year_or_date: item.year_or_date || item.date || '',
-      title: item.title || '',
-      description: item.description || '',
-      location: item.location || item.subtitle || '',
-      image_url: item.image_url || item.image || '',
-      display_order: item.display_order || 0
-    });
-    setTimelinePreview(item.image_url || item.image || '');
-    setIsAddingTimeline(true);
-  };
-
-  // Save Timeline Header
-  const handleSaveTimelineHeader = async () => {
-    setIsSubmitting(true);
-    try {
-      const result = await saveSiteSettings({
-        timeline_section_title: settingsForm.timeline_section_title,
-        timeline_subheading: settingsForm.timeline_subheading
-      });
+      const result = await saveSiteSettings(payload);
       if (!result.success) throw new Error(result.error);
-      showToast('Header Linimasa berhasil disimpan!');
+
+      setPartner1File(null);
+      setPartner2File(null);
+      if (finalImg1) setPartner1Preview(finalImg1);
+      if (finalImg2) setPartner2Preview(finalImg2);
+      showToast('Profil Pasangan & Foto berhasil disimpan langsung!');
     } catch (err) {
-      alert('Gagal menyimpan header linimasa: ' + err.message);
+      alert('Gagal menyimpan profil pasangan: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -529,7 +534,7 @@ export const AdminDashboardModal = () => {
       });
       if (!resSettings.success) throw new Error(resSettings.error);
 
-      showToast('Surat cinta & kata-kata penutup footer berhasil disimpan!');
+      showToast('Surat cinta & kata-kata penutup footer berhasil disimpan langsung!');
     } catch (err) {
       alert('Gagal menyimpan: ' + err.message);
     } finally {
@@ -582,7 +587,7 @@ export const AdminDashboardModal = () => {
         showToast('Foto berhasil dihapus.');
       } else if (deleteDialog.type === 'timeline') {
         await deleteTimeline(deleteDialog.id);
-        showToast('Milestone linimasa berhasil dihapus.');
+        showToast('Milestone berhasil dihapus.');
       }
       setDeleteDialog(null);
     } catch (err) {
@@ -594,6 +599,7 @@ export const AdminDashboardModal = () => {
 
   const isTabActive = (tabKey) => {
     if (tabKey === 'hero' && (activeDashboardTab === 'hero' || activeDashboardTab === 'settings')) return true;
+    if (tabKey === 'profile' && (activeDashboardTab === 'profile' || activeDashboardTab === 'timeline')) return true;
     return activeDashboardTab === tabKey;
   };
 
@@ -629,11 +635,18 @@ export const AdminDashboardModal = () => {
         onChange={handleStory2FileSelect} 
       />
       <input 
-        ref={timelineFileInputRef} 
+        ref={partner1FileInputRef} 
         type="file" 
         accept="image/*" 
         className="hidden" 
-        onChange={handleTimelineFileSelect} 
+        onChange={handlePartner1FileSelect} 
+      />
+      <input 
+        ref={partner2FileInputRef} 
+        type="file" 
+        accept="image/*" 
+        className="hidden" 
+        onChange={handlePartner2FileSelect} 
       />
       <input 
         ref={audioFileInputRef} 
@@ -659,7 +672,7 @@ export const AdminDashboardModal = () => {
                 Panel Kontrol & Manajemen Konten Lengkap
               </h2>
               <p className="text-[11px] text-warm-400/60 font-sans tracking-wide">
-                Kelola seluruh foto, teks, kutipan, dan musik semesta kita
+                Kelola seluruh foto profil, teks, kutipan, dan musik semesta kita — langsung tersimpan!
               </p>
             </div>
           </div>
@@ -725,15 +738,15 @@ export const AdminDashboardModal = () => {
           </button>
 
           <button
-            onClick={() => setActiveDashboardTab('timeline')}
+            onClick={() => setActiveDashboardTab('profile')}
             className={`py-3.5 px-3.5 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
-              isTabActive('timeline')
+              isTabActive('profile')
                 ? 'border-champagne-400 text-champagne-300 font-medium'
                 : 'border-transparent text-warm-400/60 hover:text-warm-200'
             }`}
           >
-            <Calendar className="w-4 h-4" />
-            <span>04. Linimasa Kisah ({timelineEvents.length > 0 ? timelineEvents.length : data?.timeline?.milestones?.length || 0})</span>
+            <User className="w-4 h-4" />
+            <span>04. Profil Pasangan</span>
           </button>
 
           <button
@@ -1039,7 +1052,7 @@ export const AdminDashboardModal = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                      Nama Pasangan
+                      Nama Pasangan (Global)
                     </label>
                     <input
                       type="text"
@@ -1276,7 +1289,7 @@ export const AdminDashboardModal = () => {
                       value={settingsForm.story_section_title}
                       onChange={(e) => setSettingsForm({ ...settingsForm, story_section_title: e.target.value })}
                       placeholder="AWAL KISAH KITA"
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
                     />
                   </div>
 
@@ -1289,7 +1302,7 @@ export const AdminDashboardModal = () => {
                       value={settingsForm.story_chapter_tag}
                       onChange={(e) => setSettingsForm({ ...settingsForm, story_chapter_tag: e.target.value })}
                       placeholder="Babak I"
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
                     />
                   </div>
 
@@ -1302,7 +1315,7 @@ export const AdminDashboardModal = () => {
                       value={settingsForm.story_date}
                       onChange={(e) => setSettingsForm({ ...settingsForm, story_date: e.target.value })}
                       placeholder="25.07.2025"
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-mono"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-mono"
                     />
                   </div>
                 </div>
@@ -1317,7 +1330,7 @@ export const AdminDashboardModal = () => {
                       value={settingsForm.story_title}
                       onChange={(e) => setSettingsForm({ ...settingsForm, story_title: e.target.value })}
                       placeholder="Pertemuan Awal di Ranggon Jaya Mart"
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-serif text-base"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif text-sm"
                     />
                   </div>
 
@@ -1330,7 +1343,7 @@ export const AdminDashboardModal = () => {
                       value={settingsForm.story_subheading}
                       onChange={(e) => setSettingsForm({ ...settingsForm, story_subheading: e.target.value })}
                       placeholder="Setiap kisah memiliki awal. Kisah kita bersemi..."
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-serif"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif"
                     />
                   </div>
                 </div>
@@ -1345,7 +1358,7 @@ export const AdminDashboardModal = () => {
                       value={settingsForm.story_location}
                       onChange={(e) => setSettingsForm({ ...settingsForm, story_location: e.target.value })}
                       placeholder="Jalan D.I. Panjaitan, Bangkinang, Riau"
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
                     />
                   </div>
 
@@ -1358,7 +1371,7 @@ export const AdminDashboardModal = () => {
                       value={settingsForm.story_coordinates}
                       onChange={(e) => setSettingsForm({ ...settingsForm, story_coordinates: e.target.value })}
                       placeholder="40°42'46.1&quot;N 74°00'21.8&quot;W"
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-mono"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-mono"
                     />
                   </div>
                 </div>
@@ -1527,272 +1540,348 @@ export const AdminDashboardModal = () => {
           )}
 
           {/* ============================================================== */}
-          {/* TAB 4: LINIMASA KISAH (TIMELINE EVENTS) */}
+          {/* TAB 4: PROFIL PASANGAN (SECTION 02) */}
           {/* ============================================================== */}
-          {activeDashboardTab === 'timeline' && (
-            <div className="space-y-6 max-w-4xl mx-auto">
+          {isTabActive('profile') && (
+            <form onSubmit={handleSaveProfile} className="space-y-6 max-w-4xl mx-auto">
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
+                <h3 className="font-serif text-lg text-warm-50 font-normal">
+                  Profil Data Diri Pasangan (Section 02)
+                </h3>
+                <p className="text-xs text-warm-400/70 font-light mt-0.5">
+                  Ubah data diri, biodata, kutipan romantis, dan upload foto profil untuk masing-masing pasangan.
+                </p>
+              </div>
+
               {/* Header Setting Box */}
               <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                  <h4 className="font-serif text-base text-warm-50 font-normal">
-                    Header Judul Linimasa (Section 02)
-                  </h4>
-                  <button
-                    type="button"
-                    onClick={handleSaveTimelineHeader}
-                    className="text-xs text-champagne-300 hover:text-champagne-200 flex items-center gap-1 font-medium"
-                  >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>Simpan Header</span>
-                  </button>
-                </div>
-
+                <h4 className="font-serif text-sm text-champagne-300 font-medium pb-2 border-b border-white/10">
+                  Header Judul Section
+                </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                      Judul Section Linimasa
+                      Judul Section
                     </label>
                     <input
                       type="text"
-                      value={settingsForm.timeline_section_title}
-                      onChange={(e) => setSettingsForm({ ...settingsForm, timeline_section_title: e.target.value })}
+                      value={settingsForm.profile_section_title}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, profile_section_title: e.target.value })}
+                      placeholder="PROFIL PASANGAN"
                       className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
                     />
                   </div>
                   <div>
                     <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                      Subheading Linimasa
+                      Subheading / Tagline Section
                     </label>
                     <input
                       type="text"
-                      value={settingsForm.timeline_subheading}
-                      onChange={(e) => setSettingsForm({ ...settingsForm, timeline_subheading: e.target.value })}
+                      value={settingsForm.profile_subheading}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, profile_subheading: e.target.value })}
+                      placeholder="Dua insan berbeda dengan cerita masing-masing..."
                       className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Action Bar */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/10">
-                <div>
-                  <h3 className="font-serif text-lg text-warm-50 font-normal">
-                    Daftar Babak Linimasa Perjalanan
-                  </h3>
-                  <p className="text-xs text-warm-400/70 font-light">
-                    Tambah, perbarui urutan, atau ubah foto & narasi setiap babak perjalanan.
-                  </p>
-                </div>
-                {!isAddingTimeline && (
-                  <button
-                    onClick={() => {
-                      setIsAddingTimeline(true);
-                      setEditingTimelineId(null);
-                      setTimelineFile(null);
-                      setTimelinePreview('');
-                      setTimelineForm({
-                        year_or_date: '',
-                        title: '',
-                        description: '',
-                        location: '',
-                        image_url: '',
-                        display_order: timelineEvents.length + 1
-                      });
-                    }}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase transition-all shadow-md active:scale-95"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Tambah Babak Baru</span>
-                  </button>
-                )}
-              </div>
+              {/* 2 Partner Profile Cards */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                {/* PARTNER 1 (WAHYU) */}
+                <div className="p-5 rounded-xl bg-white/[0.02] border border-champagne-400/20 space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                    <span className="font-serif text-sm text-champagne-300 font-medium">
+                      Partner 1 (Mempelai Pria)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => partner1FileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-[11px] text-warm-200"
+                    >
+                      <Upload className="w-3 h-3 text-champagne-300" />
+                      <span>Upload Foto Partner 1</span>
+                    </button>
+                  </div>
 
-              {/* Form Tambah / Edit Milestone */}
-              <AnimatePresence>
-                {isAddingTimeline && (
-                  <motion.form
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    onSubmit={handleSaveTimeline}
-                    className="p-5 rounded-xl border border-champagne-400/30 bg-champagne-400/[0.03] space-y-4"
-                  >
-                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                      <h4 className="font-serif text-base text-champagne-300 font-medium">
-                        {editingTimelineId ? 'Edit Babak Linimasa' : 'Tambah Babak Linimasa Baru'}
-                      </h4>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAddingTimeline(false);
-                          setEditingTimelineId(null);
-                        }}
-                        className="text-xs text-warm-400 hover:text-white"
-                      >
-                        Batal
-                      </button>
+                  {/* Photo Preview */}
+                  <div className="w-full aspect-[4/5] rounded-xl overflow-hidden border border-white/10 bg-black/60 relative">
+                    {partner1Preview ? (
+                      <img src={partner1Preview} alt="Partner 1" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-warm-400/40">Belum ada foto</div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      URL Foto Partner 1
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.partner1_photo_url}
+                      onChange={(e) => {
+                        setSettingsForm({ ...settingsForm, partner1_photo_url: e.target.value });
+                        setPartner1Preview(e.target.value);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                        Nama Panggilan
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsForm.partner1_name}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, partner1_name: e.target.value })}
+                        placeholder="Wahyu"
+                        required
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                      />
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                      <div className="md:col-span-4 flex flex-col items-center">
-                        <div className="w-full aspect-[16/10] rounded-xl overflow-hidden border border-white/15 bg-black/60 relative flex items-center justify-center">
-                          {timelinePreview ? (
-                            <img src={timelinePreview} alt="Preview" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="text-center p-3 text-warm-400/40">
-                              <ImageIcon className="w-6 h-6 mx-auto mb-1 opacity-50" />
-                              <span className="text-[11px]">Belum ada foto</span>
-                            </div>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => timelineFileInputRef.current?.click()}
-                          className="mt-2.5 w-full py-2 rounded-lg border border-dashed border-white/20 hover:border-champagne-300/60 bg-white/[0.02] text-xs text-warm-200 flex items-center justify-center gap-1.5"
-                        >
-                          <Upload className="w-3.5 h-3.5 text-champagne-300" />
-                          <span>Pilih Foto Babak</span>
-                        </button>
-                      </div>
-
-                      <div className="md:col-span-8 space-y-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                              Tanggal / Tahun
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="contoh: 25 JULI 2025"
-                              value={timelineForm.year_or_date}
-                              onChange={(e) => setTimelineForm({ ...timelineForm, year_or_date: e.target.value })}
-                              required
-                              className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-mono"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                              Tag / Lokasi / Babak
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="contoh: Babak I atau Jakarta"
-                              value={timelineForm.location}
-                              onChange={(e) => setTimelineForm({ ...timelineForm, location: e.target.value })}
-                              className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                            Judul Babak / Momen
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="contoh: Sapaan Pertama"
-                            value={timelineForm.title}
-                            onChange={(e) => setTimelineForm({ ...timelineForm, title: e.target.value })}
-                            required
-                            className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif text-sm"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                            Deskripsi Kisah Babak Ini
-                          </label>
-                          <textarea
-                            rows={3}
-                            placeholder="Tuliskan cerita yang terjadi pada babak ini..."
-                            value={timelineForm.description}
-                            onChange={(e) => setTimelineForm({ ...timelineForm, description: e.target.value })}
-                            required
-                            className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 resize-none font-sans"
-                          />
-                        </div>
-
-                        <div className="pt-2 flex justify-end gap-2">
-                          <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="px-5 py-2 rounded-xl bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
-                          >
-                            {isSubmitting ? (
-                              <>
-                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                <span>Menyimpan...</span>
-                              </>
-                            ) : (
-                              <>
-                                <Save className="w-3.5 h-3.5" />
-                                <span>{editingTimelineId ? 'Perbarui Babak' : 'Simpan Babak'}</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.form>
-                )}
-              </AnimatePresence>
-
-              {/* List Milestones */}
-              <div className="space-y-3">
-                {(timelineEvents.length > 0 ? timelineEvents : data?.timeline?.milestones || []).map((item, idx) => (
-                  <div
-                    key={item.id || idx}
-                    className="p-4 rounded-xl bg-white/[0.02] border border-white/10 hover:border-champagne-400/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-16 h-12 rounded-lg overflow-hidden bg-black/60 border border-white/10 flex-shrink-0">
-                        <img 
-                          src={item.image_url || item.image} 
-                          alt={item.title} 
-                          className="w-full h-full object-cover" 
-                        />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 text-[10px] font-mono text-champagne-300/80 mb-0.5">
-                          <span>{item.year_or_date || item.date}</span>
-                          <span className="text-white/20">•</span>
-                          <span>{item.location || item.subtitle || item.tag}</span>
-                        </div>
-                        <h4 className="font-serif text-sm text-warm-50 font-normal">
-                          {item.title}
-                        </h4>
-                        <p className="text-xs text-warm-300/70 font-light line-clamp-1 max-w-lg">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
-                      <button
-                        onClick={() => startEditTimeline(item)}
-                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-warm-200 text-xs flex items-center gap-1 transition-colors"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>Edit</span>
-                      </button>
-
-                      <button
-                        onClick={() => setDeleteDialog({
-                          type: 'timeline',
-                          id: item.id,
-                          title: item.title || `Babak ${idx + 1}`
-                        })}
-                        className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs flex items-center gap-1 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>Hapus</span>
-                      </button>
+                    <div>
+                      <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                        Nama Lengkap
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsForm.partner1_fullname}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, partner1_fullname: e.target.value })}
+                        placeholder="Wahyu"
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                      />
                     </div>
                   </div>
-                ))}
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                        Peran / Panggilan
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsForm.partner1_role}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, partner1_role: e.target.value })}
+                        placeholder="Mempelai Pria"
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                        Info / Kota / Lahir
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsForm.partner1_birthdate}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, partner1_birthdate: e.target.value })}
+                        placeholder="Kampar, Riau"
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Instagram Handle
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.partner1_instagram}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, partner1_instagram: e.target.value })}
+                      placeholder="@wahyu"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Biodata / Deskripsi Diri
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={settingsForm.partner1_bio}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, partner1_bio: e.target.value })}
+                      placeholder="Tuliskan ungkapan kepribadian atau kesan tentang pasangan ini..."
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 resize-none font-sans"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Kutipan Pribadi
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.partner1_quote}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, partner1_quote: e.target.value })}
+                      placeholder="“Menemukanmu adalah takdir terindah...”"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif italic"
+                    />
+                  </div>
+                </div>
+
+                {/* PARTNER 2 (NUR) */}
+                <div className="p-5 rounded-xl bg-white/[0.02] border border-mutedrose-400/20 space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                    <span className="font-serif text-sm text-rose-300 font-medium">
+                      Partner 2 (Mempelai Wanita)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => partner2FileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-[11px] text-warm-200"
+                    >
+                      <Upload className="w-3 h-3 text-rose-300" />
+                      <span>Upload Foto Partner 2</span>
+                    </button>
+                  </div>
+
+                  {/* Photo Preview */}
+                  <div className="w-full aspect-[4/5] rounded-xl overflow-hidden border border-white/10 bg-black/60 relative">
+                    {partner2Preview ? (
+                      <img src={partner2Preview} alt="Partner 2" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-warm-400/40">Belum ada foto</div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      URL Foto Partner 2
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.partner2_photo_url}
+                      onChange={(e) => {
+                        setSettingsForm({ ...settingsForm, partner2_photo_url: e.target.value });
+                        setPartner2Preview(e.target.value);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                        Nama Panggilan
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsForm.partner2_name}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, partner2_name: e.target.value })}
+                        placeholder="Nur"
+                        required
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                        Nama Lengkap
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsForm.partner2_fullname}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, partner2_fullname: e.target.value })}
+                        placeholder="Nur"
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                        Peran / Panggilan
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsForm.partner2_role}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, partner2_role: e.target.value })}
+                        placeholder="Mempelai Wanita"
+                        className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                        Info / Kota / Lahir
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsForm.partner2_birthdate}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, partner2_birthdate: e.target.value })}
+                        placeholder="Bangkinang, Riau"
+                        className="w-full px-3.5 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Instagram Handle
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.partner2_instagram}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, partner2_instagram: e.target.value })}
+                      placeholder="@nur"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Biodata / Deskripsi Diri
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={settingsForm.partner2_bio}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, partner2_bio: e.target.value })}
+                      placeholder="Tuliskan ungkapan kepribadian atau kesan tentang pasangan ini..."
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 resize-none font-sans"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Kutipan Pribadi
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.partner2_quote}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, partner2_quote: e.target.value })}
+                      placeholder="“Di antara ramainya dunia, hatiku selalu tahu...”"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif italic"
+                    />
+                  </div>
+                </div>
+
               </div>
-            </div>
+
+              {/* Submit Button */}
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 py-2.5 rounded-xl bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase shadow-lg transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Menyimpan ke Supabase...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Simpan Profil Pasangan</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           )}
 
           {/* ============================================================== */}
