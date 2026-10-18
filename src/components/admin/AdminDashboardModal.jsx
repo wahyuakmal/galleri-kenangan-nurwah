@@ -4,7 +4,7 @@ import {
   X, Image as ImageIcon, Plus, Trash2, Edit3, Upload, Check, AlertCircle, 
   RotateCcw, Sparkles, Calendar, MapPin, KeyRound, ShieldAlert,
   Layers, Bookmark, FileText, ArrowRight, Music, Heart, Loader2, Save,
-  Eye, EyeOff
+  Eye, EyeOff, BookOpen, Compass, Quote, MessageSquare
 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -18,6 +18,8 @@ export const AdminDashboardModal = () => {
     siteSettings,
     saveSiteSettings,
     uploadHero,
+    uploadStory,
+    uploadTimeline,
     uploadAudio,
     galleryPhotos,
     addPhoto,
@@ -31,6 +33,7 @@ export const AdminDashboardModal = () => {
     saveLoveNote,
     changePin,
     logout,
+    editTargetData,
     isSupabaseConfigured
   } = useAdmin();
 
@@ -51,21 +54,57 @@ export const AdminDashboardModal = () => {
   const [photoPreview, setPhotoPreview] = useState('');
   const [photoStoragePath, setPhotoStoragePath] = useState('');
 
-  // Tab 2: Site Settings Form State
+  // Tab 2: Site Settings & Hero Form State
   const [settingsForm, setSettingsForm] = useState({
     couple_names: '',
     relationship_start_date: '',
+    hero_badge: '',
     hero_title: '',
     hero_subtitle: '',
     hero_image_url: '',
+    hero_quote: '',
+    hero_caption: '',
     bg_music_url: '',
+
+    // Story Section (Section 01)
+    story_section_title: '',
+    story_subheading: '',
+    story_chapter_tag: '',
+    story_title: '',
+    story_date: '',
+    story_location: '',
+    story_coordinates: '',
+    story_description: '',
+    story_quote: '',
+    story_image1_url: '',
+    story_image1_caption: '',
+    story_image2_url: '',
+    story_image2_caption: '',
+
+    // Timeline Header
+    timeline_section_title: '',
+    timeline_subheading: '',
+
+    // Final Section & Footer
+    final_quote: '',
+    final_subtext: '',
+    final_button_text: '',
+    final_footer_text: '',
+    final_copyright: '',
   });
+
   const [heroFile, setHeroFile] = useState(null);
   const [heroPreview, setHeroPreview] = useState('');
   const [musicFile, setMusicFile] = useState(null);
   const [musicFileName, setMusicFileName] = useState('');
 
-  // Tab 3: Timeline Form State
+  // Story Files Form State
+  const [story1File, setStory1File] = useState(null);
+  const [story1Preview, setStory1Preview] = useState('');
+  const [story2File, setStory2File] = useState(null);
+  const [story2Preview, setStory2Preview] = useState('');
+
+  // Tab 4: Timeline Form State
   const [isAddingTimeline, setIsAddingTimeline] = useState(false);
   const [editingTimelineId, setEditingTimelineId] = useState(null);
   const [timelineForm, setTimelineForm] = useState({
@@ -73,16 +112,26 @@ export const AdminDashboardModal = () => {
     title: '',
     description: '',
     location: '',
+    image_url: '',
     display_order: 0
   });
+  const [timelineFile, setTimelineFile] = useState(null);
+  const [timelinePreview, setTimelinePreview] = useState('');
 
-  // Tab 4: Love Note Form State
+  // Tab 5: Love Note & Final Form State
   const [noteForm, setNoteForm] = useState({
+    heading: '',
+    date: '',
     letter_content: '',
-    signature_names: ''
+    signature_names: '',
+    final_quote: '',
+    final_subtext: '',
+    final_button_text: '',
+    final_footer_text: '',
+    final_copyright: ''
   });
 
-  // Tab 5: Security / PIN Form State
+  // Tab 6: Security / PIN Form State
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [showNewPin, setShowNewPin] = useState(false);
@@ -96,6 +145,9 @@ export const AdminDashboardModal = () => {
   const photoFileInputRef = useRef(null);
   const heroFileInputRef = useRef(null);
   const audioFileInputRef = useRef(null);
+  const story1FileInputRef = useRef(null);
+  const story2FileInputRef = useRef(null);
+  const timelineFileInputRef = useRef(null);
 
   // Synchronize initial values when modal opens or settings load
   useEffect(() => {
@@ -103,26 +155,91 @@ export const AdminDashboardModal = () => {
       setSettingsForm({
         couple_names: siteSettings.couple_names || '',
         relationship_start_date: siteSettings.relationship_start_date || '',
-        hero_title: siteSettings.hero_title || '',
-        hero_subtitle: siteSettings.hero_subtitle || '',
-        hero_image_url: siteSettings.hero_image_url || '',
+        hero_badge: siteSettings.hero_badge || data?.hero?.badge || 'SEMESTA KECIL KITA',
+        hero_title: siteSettings.hero_title || data?.hero?.title || '',
+        hero_subtitle: siteSettings.hero_subtitle || data?.hero?.subtitle || '',
+        hero_image_url: siteSettings.hero_image_url || data?.hero?.mainImage || '',
+        hero_quote: siteSettings.hero_quote || data?.hero?.quoteOverlay || '',
+        hero_caption: siteSettings.hero_caption || data?.hero?.imageCaption || '',
         bg_music_url: siteSettings.bg_music_url || '',
+
+        // Story Section
+        story_section_title: siteSettings.story_section_title || data?.story?.sectionTitle || 'AWAL KISAH KITA',
+        story_subheading: siteSettings.story_subheading || data?.story?.subheading || '',
+        story_chapter_tag: siteSettings.story_chapter_tag || data?.story?.chapterTag || 'Babak I',
+        story_title: siteSettings.story_title || data?.story?.title || '',
+        story_date: siteSettings.story_date || data?.story?.date || '',
+        story_location: siteSettings.story_location || data?.story?.location || '',
+        story_coordinates: siteSettings.story_coordinates || data?.story?.coordinates || '',
+        story_description: siteSettings.story_description || data?.story?.description || '',
+        story_quote: siteSettings.story_quote || data?.story?.quote || '',
+        story_image1_url: siteSettings.story_image1_url || data?.story?.image1 || '',
+        story_image1_caption: siteSettings.story_image1_caption || data?.story?.image1Caption || '',
+        story_image2_url: siteSettings.story_image2_url || data?.story?.image2 || '',
+        story_image2_caption: siteSettings.story_image2_caption || data?.story?.image2Caption || '',
+
+        // Timeline Header
+        timeline_section_title: siteSettings.timeline_section_title || data?.timeline?.sectionTitle || 'LINIMASA KITA',
+        timeline_subheading: siteSettings.timeline_subheading || data?.timeline?.subheading || '',
+
+        // Final Section
+        final_quote: siteSettings.final_quote || data?.final?.quote || '“Dan ini hanyalah sebuah permulaan.”',
+        final_subtext: siteSettings.final_subtext || data?.final?.subtext || '',
+        final_button_text: siteSettings.final_button_text || data?.final?.buttonText || 'KISAH KITA BERLANJUT',
+        final_footer_text: siteSettings.final_footer_text || data?.final?.footerText || 'Dibuat dengan segenap cinta.',
+        final_copyright: siteSettings.final_copyright || data?.final?.copyright || 'Our Little Universe • Terukir selamanya di dalam hati kita',
       });
-      setHeroPreview(siteSettings.hero_image_url || '');
+      setHeroPreview(siteSettings.hero_image_url || data?.hero?.mainImage || '');
+      setStory1Preview(siteSettings.story_image1_url || data?.story?.image1 || '');
+      setStory2Preview(siteSettings.story_image2_url || data?.story?.image2 || '');
     }
+
     if (loveNote) {
       setNoteForm({
-        letter_content: loveNote.letter_content || '',
-        signature_names: loveNote.signature_names || ''
+        heading: loveNote.heading || data?.loveLetter?.heading || 'SECARIK CATATAN DI BAWAH LANGIT BINTANG',
+        date: loveNote.date || data?.loveLetter?.date || 'Bisikan tulus di keheningan tengah malam',
+        letter_content: loveNote.letter_content || data?.loveLetter?.paragraphs?.join('\n\n') || '',
+        signature_names: loveNote.signature_names || siteSettings?.couple_names || 'Wahyu & Nur',
+        final_quote: siteSettings?.final_quote || data?.final?.quote || '“Dan ini hanyalah sebuah permulaan.”',
+        final_subtext: siteSettings?.final_subtext || data?.final?.subtext || '',
+        final_button_text: siteSettings?.final_button_text || data?.final?.buttonText || 'KISAH KITA BERLANJUT',
+        final_footer_text: siteSettings?.final_footer_text || data?.final?.footerText || 'Dibuat dengan segenap cinta.',
+        final_copyright: siteSettings?.final_copyright || data?.final?.copyright || 'Our Little Universe • Terukir selamanya di dalam hati kita',
       });
     }
-  }, [siteSettings, loveNote, isDashboardModalOpen]);
+
+    if (editTargetData) {
+      if (editTargetData.year_or_date !== undefined) {
+        // Target is timeline item
+        startEditTimeline(editTargetData);
+      } else if (editTargetData.aspect_ratio !== undefined || editTargetData.image_url) {
+        // Target is photo
+        startEditPhoto(editTargetData);
+      }
+    }
+  }, [siteSettings, loveNote, data, editTargetData, isDashboardModalOpen]);
 
   if (!isDashboardModalOpen) return null;
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3500);
+  };
+
+  // Preview Day Counter Calculation
+  const previewDaysCount = () => {
+    try {
+      if (!settingsForm.relationship_start_date) return 0;
+      const start = new Date(settingsForm.relationship_start_date);
+      const now = new Date();
+      start.setHours(0, 0, 0, 0);
+      now.setHours(0, 0, 0, 0);
+      const diffTime = Math.max(0, now - start);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return isNaN(diffDays) ? 0 : diffDays;
+    } catch {
+      return 0;
+    }
   };
 
   // ==============================================================
@@ -145,7 +262,6 @@ export const AdminDashboardModal = () => {
     setIsSubmitting(true);
     try {
       if (editingPhotoId) {
-        // Edit photo metadata
         await updatePhoto(editingPhotoId, {
           title: photoTitle,
           caption: photoCaption,
@@ -155,7 +271,6 @@ export const AdminDashboardModal = () => {
         });
         showToast('Foto momen berhasil diperbarui!');
       } else {
-        // Direct upload to Supabase Storage Bucket 'photos'
         const result = await addPhoto({
           title: photoTitle,
           caption: photoCaption,
@@ -168,7 +283,6 @@ export const AdminDashboardModal = () => {
         showToast('Foto baru berhasil diunggah ke Supabase!');
       }
 
-      // Reset form
       setIsAddingPhoto(false);
       setEditingPhotoId(null);
       setPhotoTitle('');
@@ -196,7 +310,7 @@ export const AdminDashboardModal = () => {
   };
 
   // ==============================================================
-  // TAB 2: SITE SETTINGS HANDLERS
+  // TAB 2: SITE SETTINGS & HERO HANDLERS
   // ==============================================================
   const handleHeroFileSelect = (e) => {
     const file = e.target.files?.[0];
@@ -219,7 +333,6 @@ export const AdminDashboardModal = () => {
       let finalHeroUrl = settingsForm.hero_image_url;
       let finalAudioUrl = settingsForm.bg_music_url;
 
-      // 1. Upload Hero Image if selected
       if (heroFile) {
         const heroRes = await uploadHero(heroFile);
         if (heroRes?.publicUrl) {
@@ -227,7 +340,6 @@ export const AdminDashboardModal = () => {
         }
       }
 
-      // 2. Upload Audio MP3 if selected
       if (musicFile) {
         const audioRes = await uploadAudio(musicFile);
         if (audioRes?.publicUrl) {
@@ -235,7 +347,6 @@ export const AdminDashboardModal = () => {
         }
       }
 
-      // 3. Save Site Settings to Supabase
       const payload = {
         ...settingsForm,
         hero_image_url: finalHeroUrl,
@@ -247,7 +358,7 @@ export const AdminDashboardModal = () => {
 
       setHeroFile(null);
       setMusicFile(null);
-      showToast('Pengaturan situs berhasil disimpan ke Supabase!');
+      showToast('Pengaturan situs & Hero berhasil disimpan!');
     } catch (err) {
       alert('Gagal menyimpan pengaturan: ' + err.message);
     } finally {
@@ -256,31 +367,106 @@ export const AdminDashboardModal = () => {
   };
 
   // ==============================================================
-  // TAB 3: LINIMASA (TIMELINE) HANDLERS
+  // TAB 3: KISAH PERTEMUAN (STORY SECTION 01) HANDLERS
   // ==============================================================
+  const handleStory1FileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setStory1File(file);
+    setStory1Preview(URL.createObjectURL(file));
+  };
+
+  const handleStory2FileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setStory2File(file);
+    setStory2Preview(URL.createObjectURL(file));
+  };
+
+  const handleSaveStory = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      let finalImg1 = settingsForm.story_image1_url;
+      let finalImg2 = settingsForm.story_image2_url;
+
+      if (story1File) {
+        const res1 = await uploadStory(story1File, '1');
+        if (res1?.publicUrl) finalImg1 = res1.publicUrl;
+      }
+
+      if (story2File) {
+        const res2 = await uploadStory(story2File, '2');
+        if (res2?.publicUrl) finalImg2 = res2.publicUrl;
+      }
+
+      const payload = {
+        ...settingsForm,
+        story_image1_url: finalImg1,
+        story_image2_url: finalImg2
+      };
+
+      const result = await saveSiteSettings(payload);
+      if (!result.success) throw new Error(result.error);
+
+      setStory1File(null);
+      setStory2File(null);
+      showToast('Kisah Pertemuan dan Foto berhasil disimpan!');
+    } catch (err) {
+      alert('Gagal menyimpan kisah: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ==============================================================
+  // TAB 4: LINIMASA KISAH (TIMELINE) HANDLERS
+  // ==============================================================
+  const handleTimelineFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setTimelineFile(file);
+    setTimelinePreview(URL.createObjectURL(file));
+  };
+
   const handleSaveTimeline = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      let finalImg = timelineForm.image_url;
+
+      if (timelineFile) {
+        const res = await uploadTimeline(timelineFile);
+        if (res?.publicUrl) finalImg = res.publicUrl;
+      }
+
+      const payload = {
+        ...timelineForm,
+        image_url: finalImg
+      };
+
       if (editingTimelineId) {
-        await updateTimeline(editingTimelineId, timelineForm);
-        showToast('Babak linimasa berhasil diperbarui!');
+        await updateTimeline(editingTimelineId, payload);
+        showToast('Milestone linimasa berhasil diperbarui!');
       } else {
-        await addTimeline(timelineForm);
-        showToast('Babak baru berhasil ditambahkan ke linimasa!');
+        await addTimeline(payload);
+        showToast('Milestone linimasa baru berhasil ditambahkan!');
       }
 
       setIsAddingTimeline(false);
       setEditingTimelineId(null);
+      setTimelineFile(null);
+      setTimelinePreview('');
       setTimelineForm({
         year_or_date: '',
         title: '',
         description: '',
         location: '',
-        display_order: 0
+        image_url: '',
+        display_order: timelineEvents.length + 1
       });
     } catch (err) {
-      alert('Gagal menyimpan linimasa: ' + err.message);
+      alert('Gagal menyimpan milestone: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -292,155 +478,200 @@ export const AdminDashboardModal = () => {
       year_or_date: item.year_or_date || item.date || '',
       title: item.title || '',
       description: item.description || '',
-      location: item.location || '',
+      location: item.location || item.subtitle || '',
+      image_url: item.image_url || item.image || '',
       display_order: item.display_order || 0
     });
+    setTimelinePreview(item.image_url || item.image || '');
     setIsAddingTimeline(true);
   };
 
-  // ==============================================================
-  // TAB 4: SURAT CINTA HANDLERS
-  // ==============================================================
-  const handleSaveNote = async (e) => {
-    e.preventDefault();
+  // Save Timeline Header
+  const handleSaveTimelineHeader = async () => {
     setIsSubmitting(true);
     try {
-      const result = await saveLoveNote(noteForm);
+      const result = await saveSiteSettings({
+        timeline_section_title: settingsForm.timeline_section_title,
+        timeline_subheading: settingsForm.timeline_subheading
+      });
       if (!result.success) throw new Error(result.error);
-      showToast('Surat cinta digital berhasil disimpan!');
+      showToast('Header Linimasa berhasil disimpan!');
     } catch (err) {
-      alert('Gagal menyimpan surat cinta: ' + err.message);
+      alert('Gagal menyimpan header linimasa: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // ==============================================================
-  // TAB 5: PIN & SECURITY
+  // TAB 5: SURAT CINTA & FOOTER HANDLERS
+  // ==============================================================
+  const handleSaveNoteAndFooter = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      // 1. Save Love Note
+      const resNote = await saveLoveNote({
+        heading: noteForm.heading,
+        date: noteForm.date,
+        letter_content: noteForm.letter_content,
+        signature_names: noteForm.signature_names
+      });
+      if (!resNote.success) throw new Error(resNote.error);
+
+      // 2. Save Footer & Closing Texts to site_settings
+      const resSettings = await saveSiteSettings({
+        final_quote: noteForm.final_quote,
+        final_subtext: noteForm.final_subtext,
+        final_button_text: noteForm.final_button_text,
+        final_footer_text: noteForm.final_footer_text,
+        final_copyright: noteForm.final_copyright
+      });
+      if (!resSettings.success) throw new Error(resSettings.error);
+
+      showToast('Surat cinta & kata-kata penutup footer berhasil disimpan!');
+    } catch (err) {
+      alert('Gagal menyimpan: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ==============================================================
+  // TAB 6: PIN & KEAMANAN HANDLERS
   // ==============================================================
   const handleChangePin = async (e) => {
     e.preventDefault();
+    setPinFeedback({ type: '', text: '' });
+
+    if (newPin.length < 4) {
+      setPinFeedback({ type: 'error', text: 'PIN minimal 4 karakter.' });
+      return;
+    }
+
     if (newPin !== confirmPin) {
       setPinFeedback({ type: 'error', text: 'Konfirmasi PIN tidak cocok.' });
       return;
     }
-    const res = await changePin(newPin);
-    if (res.success) {
-      setPinFeedback({ type: 'success', text: 'PIN Admin berhasil diubah!' });
-      setNewPin('');
-      setConfirmPin('');
-      showToast('PIN Admin berhasil diperbarui!');
-    } else {
-      setPinFeedback({ type: 'error', text: res.error });
+
+    setIsSubmitting(true);
+    try {
+      const result = await changePin(newPin);
+      if (result.success) {
+        setPinFeedback({ type: 'success', text: 'PIN Admin berhasil diubah!' });
+        setNewPin('');
+        setConfirmPin('');
+        showToast('PIN Admin berhasil diperbarui!');
+      } else {
+        setPinFeedback({ type: 'error', text: result.error || 'Gagal mengubah PIN.' });
+      }
+    } catch (err) {
+      setPinFeedback({ type: 'error', text: err.message });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Execute Delete
+  // Delete Action Dispatcher
   const executeDelete = async () => {
     if (!deleteDialog) return;
     setIsSubmitting(true);
     try {
       if (deleteDialog.type === 'photo') {
         await deletePhoto(deleteDialog.id, deleteDialog.storagePath);
-        showToast('Foto berhasil dihapus dari Supabase Storage & Database.');
+        showToast('Foto berhasil dihapus.');
       } else if (deleteDialog.type === 'timeline') {
         await deleteTimeline(deleteDialog.id);
-        showToast('Babak linimasa berhasil dihapus dari database.');
+        showToast('Milestone linimasa berhasil dihapus.');
       }
+      setDeleteDialog(null);
     } catch (err) {
       alert('Gagal menghapus: ' + err.message);
     } finally {
       setIsSubmitting(false);
-      setDeleteDialog(null);
     }
   };
 
-  // Day counter calculation preview
-  const previewDaysCount = () => {
-    try {
-      if (!settingsForm.relationship_start_date) return 0;
-      const start = new Date(settingsForm.relationship_start_date);
-      const now = new Date();
-      start.setHours(0, 0, 0, 0);
-      now.setHours(0, 0, 0, 0);
-      const diff = Math.max(0, now - start);
-      return Math.floor(diff / (1000 * 60 * 60 * 24));
-    } catch {
-      return 0;
-    }
+  const isTabActive = (tabKey) => {
+    if (tabKey === 'hero' && (activeDashboardTab === 'hero' || activeDashboardTab === 'settings')) return true;
+    return activeDashboardTab === tabKey;
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md"
-      onClick={closeDashboardModal}
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 20 }}
-        transition={{ duration: 0.3 }}
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-5xl max-h-[92vh] glass-panel border border-white/15 rounded-2xl shadow-2xl text-warm-100 flex flex-col overflow-hidden"
-      >
-        {/* Hidden File Inputs */}
-        <input 
-          type="file" 
-          ref={photoFileInputRef} 
-          onChange={handlePhotoFileSelect} 
-          accept="image/*" 
-          className="hidden" 
-        />
-        <input 
-          type="file" 
-          ref={heroFileInputRef} 
-          onChange={handleHeroFileSelect} 
-          accept="image/*" 
-          className="hidden" 
-        />
-        <input 
-          type="file" 
-          ref={audioFileInputRef} 
-          onChange={handleAudioFileSelect} 
-          accept="audio/*,.mp3,.m4a,.wav" 
-          className="hidden" 
-        />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md">
+      {/* Hidden File Inputs */}
+      <input 
+        ref={photoFileInputRef} 
+        type="file" 
+        accept="image/*" 
+        className="hidden" 
+        onChange={handlePhotoFileSelect} 
+      />
+      <input 
+        ref={heroFileInputRef} 
+        type="file" 
+        accept="image/*" 
+        className="hidden" 
+        onChange={handleHeroFileSelect} 
+      />
+      <input 
+        ref={story1FileInputRef} 
+        type="file" 
+        accept="image/*" 
+        className="hidden" 
+        onChange={handleStory1FileSelect} 
+      />
+      <input 
+        ref={story2FileInputRef} 
+        type="file" 
+        accept="image/*" 
+        className="hidden" 
+        onChange={handleStory2FileSelect} 
+      />
+      <input 
+        ref={timelineFileInputRef} 
+        type="file" 
+        accept="image/*" 
+        className="hidden" 
+        onChange={handleTimelineFileSelect} 
+      />
+      <input 
+        ref={audioFileInputRef} 
+        type="file" 
+        accept="audio/mp3,audio/mpeg,audio/*" 
+        className="hidden" 
+        onChange={handleAudioFileSelect} 
+      />
 
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 15 }}
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-6xl max-h-[92vh] flex flex-col rounded-2xl md:rounded-3xl bg-[#0a0a0a] border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.9)] overflow-hidden"
+      >
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#0d0d0d]/90">
+        <div className="px-6 py-4 border-b border-white/10 bg-[#0d0d0d]/90 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-champagne-400/15 text-champagne-300">
-              <Sparkles className="w-5 h-5" />
-            </div>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-serif text-lg sm:text-xl text-warm-50 font-normal">
-                  Panel Admin — Full Control
-                </h2>
-                {isSupabaseConfigured ? (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-mono border border-emerald-500/30">
-                    Supabase Connected
-                  </span>
-                ) : (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-mono border border-amber-500/30">
-                    Isi .env untuk Terhubung
-                  </span>
-                )}
-              </div>
-              <p className="text-[11px] text-warm-400/70 font-sans">
-                Kelola foto galeri, linimasa, surat cinta, dan pengaturan situs langsung ke Supabase
+              <h2 className="font-serif text-lg md:text-xl text-warm-50 font-normal">
+                Panel Kontrol & Manajemen Konten Lengkap
+              </h2>
+              <p className="text-[11px] text-warm-400/60 font-sans tracking-wide">
+                Kelola seluruh foto, teks, kutipan, dan musik semesta kita
               </p>
             </div>
           </div>
           <button
             onClick={closeDashboardModal}
-            className="p-2 text-warm-300/60 hover:text-white rounded-full hover:bg-white/5 transition-colors"
+            className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-warm-400 hover:text-white hover:border-white/30 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Toast Alert */}
+        {/* Toast Message Notification */}
         <AnimatePresence>
           {toastMessage && (
             <motion.div
@@ -456,84 +687,95 @@ export const AdminDashboardModal = () => {
         </AnimatePresence>
 
         {/* Tab Navigation */}
-        <div className="flex items-center px-6 border-b border-white/10 overflow-x-auto gap-2 bg-black/40">
+        <div className="flex items-center px-4 md:px-6 border-b border-white/10 overflow-x-auto gap-2 bg-black/40 scrollbar-none">
           <button
             onClick={() => setActiveDashboardTab('gallery')}
-            className={`py-3.5 px-4 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeDashboardTab === 'gallery'
+            className={`py-3.5 px-3.5 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+              isTabActive('gallery')
                 ? 'border-champagne-400 text-champagne-300 font-medium'
                 : 'border-transparent text-warm-400/60 hover:text-warm-200'
             }`}
           >
             <ImageIcon className="w-4 h-4" />
-            <span>01. Galeri Foto ({galleryPhotos.length > 0 ? galleryPhotos.length : data.moments.gallery.length})</span>
+            <span>01. Galeri Foto ({galleryPhotos.length > 0 ? galleryPhotos.length : data?.moments?.gallery?.length || 0})</span>
           </button>
 
           <button
-            onClick={() => setActiveDashboardTab('settings')}
-            className={`py-3.5 px-4 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeDashboardTab === 'settings'
+            onClick={() => setActiveDashboardTab('hero')}
+            className={`py-3.5 px-3.5 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+              isTabActive('hero')
                 ? 'border-champagne-400 text-champagne-300 font-medium'
                 : 'border-transparent text-warm-400/60 hover:text-warm-200'
             }`}
           >
             <Layers className="w-4 h-4" />
-            <span>02. Site Settings & Musik</span>
+            <span>02. Hero & Beranda</span>
+          </button>
+
+          <button
+            onClick={() => setActiveDashboardTab('story')}
+            className={`py-3.5 px-3.5 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+              isTabActive('story')
+                ? 'border-champagne-400 text-champagne-300 font-medium'
+                : 'border-transparent text-warm-400/60 hover:text-warm-200'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>03. Kisah Pertemuan</span>
           </button>
 
           <button
             onClick={() => setActiveDashboardTab('timeline')}
-            className={`py-3.5 px-4 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeDashboardTab === 'timeline'
+            className={`py-3.5 px-3.5 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+              isTabActive('timeline')
                 ? 'border-champagne-400 text-champagne-300 font-medium'
                 : 'border-transparent text-warm-400/60 hover:text-warm-200'
             }`}
           >
             <Calendar className="w-4 h-4" />
-            <span>03. Linimasa ({timelineEvents.length > 0 ? timelineEvents.length : data.timeline.milestones.length})</span>
+            <span>04. Linimasa Kisah ({timelineEvents.length > 0 ? timelineEvents.length : data?.timeline?.milestones?.length || 0})</span>
           </button>
 
           <button
             onClick={() => setActiveDashboardTab('letter')}
-            className={`py-3.5 px-4 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeDashboardTab === 'letter'
+            className={`py-3.5 px-3.5 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+              isTabActive('letter')
                 ? 'border-champagne-400 text-champagne-300 font-medium'
                 : 'border-transparent text-warm-400/60 hover:text-warm-200'
             }`}
           >
             <Heart className="w-4 h-4 text-rose-400/80" />
-            <span>04. Surat Cinta</span>
+            <span>05. Surat Cinta & Footer</span>
           </button>
 
           <button
             onClick={() => setActiveDashboardTab('security')}
-            className={`py-3.5 px-4 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeDashboardTab === 'security'
+            className={`py-3.5 px-3.5 text-xs font-sans tracking-wider uppercase border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+              isTabActive('security')
                 ? 'border-champagne-400 text-champagne-300 font-medium'
                 : 'border-transparent text-warm-400/60 hover:text-warm-200'
             }`}
           >
             <KeyRound className="w-4 h-4" />
-            <span>05. PIN & Keamanan</span>
+            <span>06. PIN & Keamanan</span>
           </button>
         </div>
 
         {/* Tab Contents */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
 
           {/* ============================================================== */}
-          {/* TAB 1: GALERI FOTO (SUPABASE CRUD & BUCKET 'photos') */}
+          {/* TAB 1: GALERI FOTO (MOMENTS) */}
           {/* ============================================================== */}
           {activeDashboardTab === 'gallery' && (
             <div className="space-y-6">
-              {/* Header Action */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/10">
                 <div>
                   <h3 className="font-serif text-lg text-warm-50 font-normal">
                     Kelola Galeri Foto (Supabase Bucket: 'photos')
                   </h3>
                   <p className="text-xs text-warm-400/70 font-light">
-                    Direct upload ke storage bucket 'photos', auto-fetch public URL, dan simpan metadata ke database.
+                    Direct upload ke storage bucket 'photos', auto-fetch public URL, dan simpan keterangan momen.
                   </p>
                 </div>
                 {!isAddingPhoto && (
@@ -583,7 +825,6 @@ export const AdminDashboardModal = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                      {/* Image Preview & Upload Input */}
                       <div className="md:col-span-5 flex flex-col items-center">
                         <div className="w-full aspect-[4/5] rounded-xl overflow-hidden border border-white/15 bg-black/60 relative flex items-center justify-center">
                           {photoPreview ? (
@@ -599,38 +840,40 @@ export const AdminDashboardModal = () => {
                             </div>
                           )}
                         </div>
-
-                        <div className="w-full mt-3">
-                          <button
-                            type="button"
-                            onClick={() => photoFileInputRef.current?.click()}
-                            className="w-full py-2.5 px-3 rounded-lg bg-champagne-400/15 hover:bg-champagne-400/25 border border-champagne-400/40 text-xs text-champagne-200 flex items-center justify-center gap-2 transition-colors font-medium"
-                          >
-                            <Upload className="w-4 h-4 text-champagne-300" />
-                            <span>{photoFile ? photoFile.name : 'Pilih File Foto dari Perangkat'}</span>
-                          </button>
-                        </div>
-
-                        <div className="w-full mt-2">
-                          <input
-                            type="text"
-                            placeholder="Atau masukkan tautan / URL foto..."
-                            value={photoPreview}
-                            onChange={(e) => setPhotoPreview(e.target.value)}
-                            className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-200 placeholder:text-warm-400/30 focus:outline-none focus:border-champagne-400"
-                          />
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => photoFileInputRef.current?.click()}
+                          className="mt-3 w-full py-2.5 rounded-lg border border-dashed border-white/20 hover:border-champagne-300/60 bg-white/[0.02] hover:bg-white/[0.05] text-xs text-warm-200 flex items-center justify-center gap-2 transition-all"
+                        >
+                          <Upload className="w-4 h-4 text-champagne-300" />
+                          <span>{photoFile ? 'Ganti File Gambar' : 'Pilih File Gambar'}</span>
+                        </button>
                       </div>
 
-                      {/* Detail Fields */}
                       <div className="md:col-span-7 space-y-3.5">
                         <div>
                           <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                            Judul / Label Momen
+                            URL Gambar Langsung (Opsional jika upload file)
                           </label>
                           <input
                             type="text"
-                            placeholder="contoh: Senja di Tepi Pantai / Kedai Kopi Tua"
+                            placeholder="https://... atau biarkan kosong jika upload file"
+                            value={photoPreview.startsWith('blob:') ? '' : photoPreview}
+                            onChange={(e) => {
+                              setPhotoPreview(e.target.value);
+                              setPhotoFile(null);
+                            }}
+                            className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                            Judul / Lokasi Momen
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="contoh: Teras Sore / Toko Buku Tua"
                             value={photoTitle}
                             onChange={(e) => setPhotoTitle(e.target.value)}
                             required
@@ -640,71 +883,50 @@ export const AdminDashboardModal = () => {
 
                         <div>
                           <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                            Tanggal Kenangan
+                            Tanggal Pengambilan Foto
                           </label>
                           <input
                             type="text"
-                            placeholder="contoh: 12.08.2024 atau 14 Februari 2025"
+                            placeholder="contoh: 12.08.2024 atau 12 Agustus 2024"
                             value={photoDate}
                             onChange={(e) => setPhotoDate(e.target.value)}
-                            className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                            className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-mono"
                           />
                         </div>
 
                         <div>
                           <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                            Caption Romantis
+                            Aspek Rasio Tampilan
+                          </label>
+                          <select
+                            value={photoAspect}
+                            onChange={(e) => setPhotoAspect(e.target.value)}
+                            className="w-full px-3.5 py-2 rounded-lg bg-[#141414] border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                          >
+                            <option value="portrait">Tegak (Portrait 4:5)</option>
+                            <option value="landscape">Mendatar (Landscape 16:10)</option>
+                            <option value="square">Persegi (Square 1:1)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                            Kata-Kata / Caption Momen
                           </label>
                           <textarea
                             rows={3}
-                            placeholder="Tuliskan cerita singkat atau kutipan romantis tentang foto ini..."
+                            placeholder="Tuliskan cerita singkat atau kutipan romantis di balik foto ini..."
                             value={photoCaption}
                             onChange={(e) => setPhotoCaption(e.target.value)}
-                            className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 resize-none leading-relaxed"
+                            className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 resize-none font-serif italic"
                           />
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                            Format Tampilan (Rasio Foto)
-                          </label>
-                          <div className="grid grid-cols-3 gap-2">
-                            {[
-                              { id: 'portrait', label: 'Tegak (Portrait)' },
-                              { id: 'landscape', label: 'Lebar (Landscape)' },
-                              { id: 'square', label: 'Persegi (Square)' },
-                            ].map((asp) => (
-                              <button
-                                key={asp.id}
-                                type="button"
-                                onClick={() => setPhotoAspect(asp.id)}
-                                className={`py-2 px-2 rounded-lg text-xs border text-center transition-all ${
-                                  photoAspect === asp.id
-                                    ? 'bg-champagne-400/20 border-champagne-400 text-champagne-200 font-medium'
-                                    : 'bg-black/30 border-white/10 text-warm-400 hover:text-warm-200'
-                                }`}
-                              >
-                                {asp.label}
-                              </button>
-                            ))}
-                          </div>
                         </div>
 
                         <div className="pt-2 flex justify-end gap-2">
                           <button
-                            type="button"
-                            onClick={() => {
-                              setIsAddingPhoto(false);
-                              setEditingPhotoId(null);
-                            }}
-                            className="px-4 py-2 rounded-lg text-xs text-warm-400 hover:text-white"
-                          >
-                            Batal
-                          </button>
-                          <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-5 py-2.5 rounded-lg bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase shadow-md transition-colors flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2.5 rounded-xl bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
                           >
                             {isSubmitting ? (
                               <>
@@ -714,7 +936,7 @@ export const AdminDashboardModal = () => {
                             ) : (
                               <>
                                 <Save className="w-4 h-4" />
-                                <span>{editingPhotoId ? 'Simpan Perubahan' : 'Upload ke Supabase'}</span>
+                                <span>{editingPhotoId ? 'Perbarui Foto' : 'Simpan Foto ke Cloud'}</span>
                               </>
                             )}
                           </button>
@@ -725,17 +947,17 @@ export const AdminDashboardModal = () => {
                 )}
               </AnimatePresence>
 
-              {/* Grid Daftar Foto */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {(galleryPhotos.length > 0 ? galleryPhotos : data.moments.gallery).map((item, idx) => {
+              {/* Grid List Foto Galeri */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {(galleryPhotos.length > 0 ? galleryPhotos : data?.moments?.gallery || []).map((item, idx) => {
                   const imgUrl = item.image_url || item.image;
-                  const dateStr = item.date_taken || item.date;
-                  const captionStr = item.caption || item.title;
+                  const dateStr = item.date_taken || item.date || '-';
+                  const captionStr = item.caption || item.title || 'Momen Kenangan';
 
                   return (
                     <div
-                      key={item.id}
-                      className="p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between group"
+                      key={item.id || idx}
+                      className="group rounded-xl p-3 bg-white/[0.02] border border-white/10 hover:border-champagne-400/40 transition-all flex flex-col justify-between"
                     >
                       <div>
                         <div className="relative aspect-[16/10] rounded-lg overflow-hidden mb-2.5 bg-black/60">
@@ -795,26 +1017,29 @@ export const AdminDashboardModal = () => {
           )}
 
           {/* ============================================================== */}
-          {/* TAB 2: SITE SETTINGS & HERO & MUSIK MP3 */}
+          {/* TAB 2: HERO & BERANDA UTAMA & MUSIK MP3 */}
           {/* ============================================================== */}
-          {activeDashboardTab === 'settings' && (
-            <form onSubmit={handleSaveSettings} className="space-y-6 max-w-3xl mx-auto">
-              {/* Header Box */}
+          {isTabActive('hero') && (
+            <form onSubmit={handleSaveSettings} className="space-y-6 max-w-4xl mx-auto">
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
                 <h3 className="font-serif text-lg text-warm-50 font-normal">
-                  Pengaturan Situs (Tabel: 'site_settings')
+                  Pengaturan Beranda & Hero Section
                 </h3>
                 <p className="text-xs text-warm-400/70 font-light mt-0.5">
-                  Ubah nama pasangan, tanggal jadian (Day Counter), foto Hero (Bucket: 'photos'), dan musik latar (Bucket: 'audio').
+                  Atur nama pasangan, tanggal jadian otomatis (Day Counter), badge, judul, kutipan bawah foto, dan lagu latar semesta kita.
                 </p>
               </div>
 
               {/* Identitas Pasangan & Tanggal Jadian */}
               <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-4">
+                <h4 className="font-serif text-sm text-champagne-300 font-medium pb-2 border-b border-white/10">
+                  Identitas Pasangan & Penghitung Hari (Day Counter)
+                </h4>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                      Nama Pasangan (couple_names)
+                      Nama Pasangan
                     </label>
                     <input
                       type="text"
@@ -822,7 +1047,7 @@ export const AdminDashboardModal = () => {
                       value={settingsForm.couple_names}
                       onChange={(e) => setSettingsForm({ ...settingsForm, couple_names: e.target.value })}
                       required
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-editorial text-base"
                     />
                     <p className="text-[10px] text-warm-400/50 mt-1">
                       Ditampilkan di Navbar, Hero, Love Letter, dan Footer.
@@ -831,7 +1056,7 @@ export const AdminDashboardModal = () => {
 
                   <div>
                     <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                      Tanggal Jadian (relationship_start_date)
+                      Tanggal Jadian / Hari Jadian Dimulai
                     </label>
                     <input
                       type="date"
@@ -846,30 +1071,72 @@ export const AdminDashboardModal = () => {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Badge Atas Hero
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.hero_badge}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, hero_badge: e.target.value })}
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Keterangan Foto / Koordinat Waktu Hero
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.hero_caption}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, hero_caption: e.target.value })}
+                      placeholder="contoh: Koordinat petang yang teduh / 18:42 WIB"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-mono"
+                    />
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div>
                     <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                      Judul Utama Hero (hero_title)
+                      Judul Utama Hero
                     </label>
                     <textarea
                       rows={2}
                       value={settingsForm.hero_title}
                       onChange={(e) => setSettingsForm({ ...settingsForm, hero_title: e.target.value })}
-                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 resize-none"
+                      placeholder="Di antara dua orang asing, kita menjadi kita."
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 resize-none font-serif"
                     />
                   </div>
 
                   <div>
                     <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                      Subtitle Hero (hero_subtitle)
+                      Deskripsi / Subtitle Hero (di bawah foto)
                     </label>
                     <textarea
                       rows={2}
                       value={settingsForm.hero_subtitle}
                       onChange={(e) => setSettingsForm({ ...settingsForm, hero_subtitle: e.target.value })}
+                      placeholder="Ruang digital dokumentasi perjalanan cinta berdua..."
                       className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 resize-none"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                    Kutipan Romantis di Bawah Foto Hero
+                  </label>
+                  <input
+                    type="text"
+                    value={settingsForm.hero_quote}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, hero_quote: e.target.value })}
+                    placeholder="“Di semesta yang seluas ini, hatiku memilih ketenangan di sampingmu.”"
+                    className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-serif italic"
+                  />
                 </div>
               </div>
 
@@ -899,7 +1166,7 @@ export const AdminDashboardModal = () => {
                   </div>
                   <div className="md:col-span-8 space-y-2">
                     <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70">
-                      URL Gambar Hero (hero_image_url)
+                      URL Gambar Hero
                     </label>
                     <input
                       type="text"
@@ -971,7 +1238,7 @@ export const AdminDashboardModal = () => {
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      <span>Simpan Pengaturan Situs</span>
+                      <span>Simpan Pengaturan Hero & Beranda</span>
                     </>
                   )}
                 </button>
@@ -980,18 +1247,340 @@ export const AdminDashboardModal = () => {
           )}
 
           {/* ============================================================== */}
-          {/* TAB 3: LINIMASA (timeline_events) */}
+          {/* TAB 3: KISAH PERTEMUAN (SECTION 01: STORY SECTION) */}
+          {/* ============================================================== */}
+          {activeDashboardTab === 'story' && (
+            <form onSubmit={handleSaveStory} className="space-y-6 max-w-4xl mx-auto">
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
+                <h3 className="font-serif text-lg text-warm-50 font-normal">
+                  Kisah Pertemuan & Dokumentasi Awal (Section 01)
+                </h3>
+                <p className="text-xs text-warm-400/70 font-light mt-0.5">
+                  Ubah judul babak, tanggal pertemuan, nama lokasi, koordinat GPS, narasi cerita lengkap, kutipan, dan kedua foto kenangan.
+                </p>
+              </div>
+
+              {/* Header & Judul Cerita */}
+              <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-4">
+                <h4 className="font-serif text-sm text-champagne-300 font-medium pb-2 border-b border-white/10">
+                  Header & Judul Babak Cerita
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Nomor & Judul Section
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_section_title}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_section_title: e.target.value })}
+                      placeholder="AWAL KISAH KITA"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Tag Babak
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_chapter_tag}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_chapter_tag: e.target.value })}
+                      placeholder="Babak I"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Tanggal Pertemuan
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_date}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_date: e.target.value })}
+                      placeholder="25.07.2025"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Judul Kisah Pertemuan
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_title}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_title: e.target.value })}
+                      placeholder="Pertemuan Awal di Ranggon Jaya Mart"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-serif text-base"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Subheading / Tagline Atas
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_subheading}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_subheading: e.target.value })}
+                      placeholder="Setiap kisah memiliki awal. Kisah kita bersemi..."
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-serif"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Nama Lokasi Pertemuan
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_location}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_location: e.target.value })}
+                      placeholder="Jalan D.I. Panjaitan, Bangkinang, Riau"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Koordinat Lokasi (GPS)
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_coordinates}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_coordinates: e.target.value })}
+                      placeholder="40°42'46.1&quot;N 74°00'21.8&quot;W"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Teks Cerita Pertemuan Lengkap */}
+                <div>
+                  <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                    Teks Deskripsi / Cerita Pertemuan Lengkap
+                  </label>
+                  <textarea
+                    rows={8}
+                    value={settingsForm.story_description}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, story_description: e.target.value })}
+                    placeholder="Tuliskan cerita lengkap awal mula pertemuan kalian berdua..."
+                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-xs sm:text-sm text-warm-100 focus:outline-none focus:border-champagne-400 leading-relaxed font-sans"
+                  />
+                  <p className="text-[10px] text-warm-400/50 mt-1">
+                    Gunakan Enter dua kali untuk memisahkan antar paragraf. Teks akan tampil rapi dengan tata letak editorial.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                    Kutipan Khusus Kisah (Quote Callout)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={settingsForm.story_quote}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, story_quote: e.target.value })}
+                    placeholder="“Dunia di luar begitu bising, namun duduk di hadapanmu...”"
+                    className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-serif italic"
+                  />
+                </div>
+              </div>
+
+              {/* Foto 1 & Foto 2 Story Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Foto 1: Visual Utama Kisah */}
+                <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-serif text-sm text-champagne-300 font-medium">
+                      Foto Utama Kisah (Image 1)
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => story1FileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-[11px] text-warm-200"
+                    >
+                      <Upload className="w-3 h-3 text-champagne-300" />
+                      <span>Upload Foto 1</span>
+                    </button>
+                  </div>
+
+                  <div className="w-full aspect-[4/5] rounded-xl overflow-hidden border border-white/10 bg-black/60 relative">
+                    {story1Preview ? (
+                      <img src={story1Preview} alt="Story 1" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-warm-400/40">Belum ada foto</div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      URL Foto 1
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_image1_url}
+                      onChange={(e) => {
+                        setSettingsForm({ ...settingsForm, story_image1_url: e.target.value });
+                        setStory1Preview(e.target.value);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Keterangan / Caption Foto 1
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_image1_caption}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_image1_caption: e.target.value })}
+                      placeholder="Sudut kedai kopi tempat waktu terasa berhenti"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Foto 2: Cuplikan Koordinat */}
+                <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-serif text-sm text-champagne-300 font-medium">
+                      Foto Cuplikan Koordinat (Image 2)
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => story2FileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-[11px] text-warm-200"
+                    >
+                      <Upload className="w-3 h-3 text-champagne-300" />
+                      <span>Upload Foto 2</span>
+                    </button>
+                  </div>
+
+                  <div className="w-full aspect-[4/5] rounded-xl overflow-hidden border border-white/10 bg-black/60 relative">
+                    {story2Preview ? (
+                      <img src={story2Preview} alt="Story 2" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-warm-400/40">Belum ada foto</div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      URL Foto 2
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_image2_url}
+                      onChange={(e) => {
+                        setSettingsForm({ ...settingsForm, story_image2_url: e.target.value });
+                        setStory2Preview(e.target.value);
+                      }}
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Keterangan / Caption Foto 2
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.story_image2_caption}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, story_image2_caption: e.target.value })}
+                      placeholder="Tatap mata pertama di tengah gerimis"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 py-2.5 rounded-xl bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase shadow-lg transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Menyimpan ke Supabase...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Simpan Kisah & Foto Section 01</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* ============================================================== */}
+          {/* TAB 4: LINIMASA KISAH (TIMELINE EVENTS) */}
           {/* ============================================================== */}
           {activeDashboardTab === 'timeline' && (
-            <div className="space-y-6">
-              {/* Header Action */}
+            <div className="space-y-6 max-w-4xl mx-auto">
+              {/* Header Setting Box */}
+              <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                  <h4 className="font-serif text-base text-warm-50 font-normal">
+                    Header Judul Linimasa (Section 02)
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={handleSaveTimelineHeader}
+                    className="text-xs text-champagne-300 hover:text-champagne-200 flex items-center gap-1 font-medium"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>Simpan Header</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Judul Section Linimasa
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.timeline_section_title}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, timeline_section_title: e.target.value })}
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Subheading Linimasa
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.timeline_subheading}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, timeline_subheading: e.target.value })}
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Bar */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/10">
                 <div>
                   <h3 className="font-serif text-lg text-warm-50 font-normal">
-                    Linimasa Kisah Perjalanan (Tabel: 'timeline_events')
+                    Daftar Babak Linimasa Perjalanan
                   </h3>
                   <p className="text-xs text-warm-400/70 font-light">
-                    Tambah, edit, dan hapus milestone linimasa perjalanan cinta.
+                    Tambah, perbarui urutan, atau ubah foto & narasi setiap babak perjalanan.
                   </p>
                 </div>
                 {!isAddingTimeline && (
@@ -999,18 +1588,21 @@ export const AdminDashboardModal = () => {
                     onClick={() => {
                       setIsAddingTimeline(true);
                       setEditingTimelineId(null);
+                      setTimelineFile(null);
+                      setTimelinePreview('');
                       setTimelineForm({
                         year_or_date: '',
                         title: '',
                         description: '',
                         location: '',
+                        image_url: '',
                         display_order: timelineEvents.length + 1
                       });
                     }}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase transition-all shadow-md active:scale-95"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Tambah Milestone Baru</span>
+                    <span>Tambah Babak Baru</span>
                   </button>
                 )}
               </div>
@@ -1027,7 +1619,7 @@ export const AdminDashboardModal = () => {
                   >
                     <div className="flex items-center justify-between pb-3 border-b border-white/10">
                       <h4 className="font-serif text-base text-champagne-300 font-medium">
-                        {editingTimelineId ? 'Edit Milestone Linimasa' : 'Tambah Milestone Linimasa Baru'}
+                        {editingTimelineId ? 'Edit Babak Linimasa' : 'Tambah Babak Linimasa Baru'}
                       </h4>
                       <button
                         type="button"
@@ -1041,178 +1633,220 @@ export const AdminDashboardModal = () => {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                          Tanggal / Tahun (year_or_date)
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="contoh: 25 JULI 2025 atau Musim Gugur 2024"
-                          value={timelineForm.year_or_date}
-                          onChange={(e) => setTimelineForm({ ...timelineForm, year_or_date: e.target.value })}
-                          required
-                          className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                      <div className="md:col-span-4 flex flex-col items-center">
+                        <div className="w-full aspect-[16/10] rounded-xl overflow-hidden border border-white/15 bg-black/60 relative flex items-center justify-center">
+                          {timelinePreview ? (
+                            <img src={timelinePreview} alt="Preview" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="text-center p-3 text-warm-400/40">
+                              <ImageIcon className="w-6 h-6 mx-auto mb-1 opacity-50" />
+                              <span className="text-[11px]">Belum ada foto</span>
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => timelineFileInputRef.current?.click()}
+                          className="mt-2.5 w-full py-2 rounded-lg border border-dashed border-white/20 hover:border-champagne-300/60 bg-white/[0.02] text-xs text-warm-200 flex items-center justify-center gap-1.5"
+                        >
+                          <Upload className="w-3.5 h-3.5 text-champagne-300" />
+                          <span>Pilih Foto Babak</span>
+                        </button>
                       </div>
 
-                      <div>
-                        <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                          Judul Milestone (title)
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="contoh: Sapaan Pertama / Kencan Pertama"
-                          value={timelineForm.title}
-                          onChange={(e) => setTimelineForm({ ...timelineForm, title: e.target.value })}
-                          required
-                          className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
-                        />
+                      <div className="md:col-span-8 space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                              Tanggal / Tahun
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="contoh: 25 JULI 2025"
+                              value={timelineForm.year_or_date}
+                              onChange={(e) => setTimelineForm({ ...timelineForm, year_or_date: e.target.value })}
+                              required
+                              className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-mono"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                              Tag / Lokasi / Babak
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="contoh: Babak I atau Jakarta"
+                              value={timelineForm.location}
+                              onChange={(e) => setTimelineForm({ ...timelineForm, location: e.target.value })}
+                              className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                            Judul Babak / Momen
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="contoh: Sapaan Pertama"
+                            value={timelineForm.title}
+                            onChange={(e) => setTimelineForm({ ...timelineForm, title: e.target.value })}
+                            required
+                            className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif text-sm"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                            Deskripsi Kisah Babak Ini
+                          </label>
+                          <textarea
+                            rows={3}
+                            placeholder="Tuliskan cerita yang terjadi pada babak ini..."
+                            value={timelineForm.description}
+                            onChange={(e) => setTimelineForm({ ...timelineForm, description: e.target.value })}
+                            required
+                            className="w-full px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 resize-none font-sans"
+                          />
+                        </div>
+
+                        <div className="pt-2 flex justify-end gap-2">
+                          <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="px-5 py-2 rounded-xl bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                <span>Menyimpan...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Save className="w-3.5 h-3.5" />
+                                <span>{editingTimelineId ? 'Perbarui Babak' : 'Simpan Babak'}</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
-
-                      <div>
-                        <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                          Lokasi / Tag (location)
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="contoh: Kedai Kopi Sudut Jalan"
-                          value={timelineForm.location}
-                          onChange={(e) => setTimelineForm({ ...timelineForm, location: e.target.value })}
-                          className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                          Urutan Tampilan (display_order)
-                        </label>
-                        <input
-                          type="number"
-                          value={timelineForm.display_order}
-                          onChange={(e) => setTimelineForm({ ...timelineForm, display_order: parseInt(e.target.value, 10) || 0 })}
-                          className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
-                        Cerita Peristiwa (description)
-                      </label>
-                      <textarea
-                        rows={3}
-                        placeholder="Tuliskan kisah momen indah yang terjadi pada babak ini..."
-                        value={timelineForm.description}
-                        onChange={(e) => setTimelineForm({ ...timelineForm, description: e.target.value })}
-                        required
-                        className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 resize-none leading-relaxed"
-                      />
-                    </div>
-
-                    <div className="pt-2 flex justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsAddingTimeline(false);
-                          setEditingTimelineId(null);
-                        }}
-                        className="px-4 py-2 rounded-lg text-xs text-warm-400 hover:text-white"
-                      >
-                        Batal
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="px-5 py-2.5 rounded-lg bg-champagne-300 hover:bg-champagne-200 text-[#080808] font-medium text-xs tracking-wider uppercase shadow-md transition-colors flex items-center gap-2 disabled:opacity-50"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Menyimpan...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-4 h-4" />
-                            <span>{editingTimelineId ? 'Simpan Perubahan' : 'Tambahkan Babak'}</span>
-                          </>
-                        )}
-                      </button>
                     </div>
                   </motion.form>
                 )}
               </AnimatePresence>
 
-              {/* List Timeline Items */}
+              {/* List Milestones */}
               <div className="space-y-3">
-                {(timelineEvents.length > 0 ? timelineEvents : data.timeline.milestones).map((item, idx) => {
-                  const dateStr = item.year_or_date || item.date;
-                  return (
-                    <div
-                      key={item.id}
-                      className="p-4 rounded-xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all flex flex-col md:flex-row gap-4 items-start md:items-center justify-between"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 text-[10px] font-mono text-champagne-300/80 mb-1">
-                          <span className="px-2 py-0.5 rounded bg-black/50 border border-white/10">#{item.display_order ?? idx + 1}</span>
-                          <span>{dateStr}</span>
-                          {item.location && (
-                            <>
-                              <span className="text-white/20">•</span>
-                              <span className="text-warm-300/70">{item.location}</span>
-                            </>
-                          )}
-                        </div>
-                        <h4 className="font-serif text-base text-warm-50 font-medium">{item.title}</h4>
-                        <p className="text-xs text-warm-400/80 line-clamp-2 mt-1 leading-relaxed font-light">{item.description}</p>
+                {(timelineEvents.length > 0 ? timelineEvents : data?.timeline?.milestones || []).map((item, idx) => (
+                  <div
+                    key={item.id || idx}
+                    className="p-4 rounded-xl bg-white/[0.02] border border-white/10 hover:border-champagne-400/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-12 rounded-lg overflow-hidden bg-black/60 border border-white/10 flex-shrink-0">
+                        <img 
+                          src={item.image_url || item.image} 
+                          alt={item.title} 
+                          className="w-full h-full object-cover" 
+                        />
                       </div>
-
-                      <div className="flex items-center gap-2 self-end md:self-center">
-                        <button
-                          onClick={() => startEditTimeline(item)}
-                          className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-xs text-warm-200 flex items-center gap-1.5 transition-colors"
-                        >
-                          <Edit3 className="w-3.5 h-3.5 text-champagne-300" />
-                          <span>Edit</span>
-                        </button>
-                        <button
-                          onClick={() => setDeleteDialog({
-                            type: 'timeline',
-                            id: item.id,
-                            title: item.title
-                          })}
-                          className="p-1.5 rounded-lg text-rose-400/70 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
-                          title="Hapus babak ini"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                      <div>
+                        <div className="flex items-center gap-2 text-[10px] font-mono text-champagne-300/80 mb-0.5">
+                          <span>{item.year_or_date || item.date}</span>
+                          <span className="text-white/20">•</span>
+                          <span>{item.location || item.subtitle || item.tag}</span>
+                        </div>
+                        <h4 className="font-serif text-sm text-warm-50 font-normal">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-warm-300/70 font-light line-clamp-1 max-w-lg">
+                          {item.description}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
+
+                    <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
+                      <button
+                        onClick={() => startEditTimeline(item)}
+                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-warm-200 text-xs flex items-center gap-1 transition-colors"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+
+                      <button
+                        onClick={() => setDeleteDialog({
+                          type: 'timeline',
+                          id: item.id,
+                          title: item.title || `Babak ${idx + 1}`
+                        })}
+                        className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs flex items-center gap-1 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Hapus</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {/* ============================================================== */}
-          {/* TAB 4: SURAT CINTA DIGITAL (love_notes) */}
+          {/* TAB 5: SURAT CINTA & KATA-KATA PENUTUP FOOTER */}
           {/* ============================================================== */}
           {activeDashboardTab === 'letter' && (
-            <form onSubmit={handleSaveNote} className="space-y-6 max-w-3xl mx-auto">
+            <form onSubmit={handleSaveNoteAndFooter} className="space-y-6 max-w-4xl mx-auto">
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10">
                 <div className="flex items-center gap-2 text-rose-300 font-medium text-sm mb-1">
                   <Heart className="w-4 h-4 text-rose-400 fill-rose-400/30" />
-                  <span>Surat Cinta Digital (Tabel: 'love_notes')</span>
+                  <span>Surat Cinta & Kata-Kata Penutup Footer</span>
                 </div>
                 <p className="text-xs text-warm-400/70 font-light">
-                  Surat cinta yang tertulis di bawah langit bintang pada Section Love Letter.
+                  Edit surat cinta digital di bawah langit bintang dan seluruh kata-kata penutup footer di akhir website.
                 </p>
               </div>
 
+              {/* Surat Cinta Box */}
               <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-4">
+                <h4 className="font-serif text-sm text-champagne-300 font-medium pb-2 border-b border-white/10">
+                  Secarik Surat Cinta (Section 04)
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Judul Surat Cinta
+                    </label>
+                    <input
+                      type="text"
+                      value={noteForm.heading}
+                      onChange={(e) => setNoteForm({ ...noteForm, heading: e.target.value })}
+                      placeholder="SECARIK CATATAN DI BAWAH LANGIT BINTANG"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Subheading / Waktu Surat
+                    </label>
+                    <input
+                      type="text"
+                      value={noteForm.date}
+                      onChange={(e) => setNoteForm({ ...noteForm, date: e.target.value })}
+                      placeholder="Bisikan tulus di keheningan tengah malam"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-mono"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1.5">
-                    Isi Surat Cinta (letter_content)
+                    Isi Paragraf Surat Cinta (letter_content)
                   </label>
                   <textarea
                     rows={8}
@@ -1229,15 +1863,95 @@ export const AdminDashboardModal = () => {
 
                 <div>
                   <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1.5">
-                    Tanda Tangan / Nama Pasangan (signature_names)
+                    Tanda Tangan Surat Cinta
                   </label>
                   <input
                     type="text"
                     value={noteForm.signature_names}
                     onChange={(e) => setNoteForm({ ...noteForm, signature_names: e.target.value })}
-                    placeholder="contoh: Wahyu & Nur"
-                    className="w-full px-4 py-2 rounded-xl bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-editorial text-base"
+                    placeholder="contoh: Selamanya milikmu, dengan segenap cinta"
+                    className="w-full px-4 py-2 rounded-xl bg-black/50 border border-white/10 text-xs text-warm-100 focus:outline-none focus:border-champagne-400 font-serif italic text-sm"
                   />
+                </div>
+              </div>
+
+              {/* Kata-Kata Penutup & Footer */}
+              <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-4">
+                <h4 className="font-serif text-sm text-champagne-300 font-medium pb-2 border-b border-white/10">
+                  Teks Penutup & Footer (Final Section)
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Kutipan Akhir Penutup
+                    </label>
+                    <input
+                      type="text"
+                      value={noteForm.final_quote}
+                      onChange={(e) => setNoteForm({ ...noteForm, final_quote: e.target.value })}
+                      placeholder="“Dan ini hanyalah sebuah permulaan.”"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 font-serif text-base"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Teks Tombol Kembali Ke Atas
+                    </label>
+                    <input
+                      type="text"
+                      value={noteForm.final_button_text}
+                      onChange={(e) => setNoteForm({ ...noteForm, final_button_text: e.target.value })}
+                      placeholder="KISAH KITA BERLANJUT"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 uppercase tracking-wider"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                    Subtext Narasi Penutup
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={noteForm.final_subtext}
+                    onChange={(e) => setNoteForm({ ...noteForm, final_subtext: e.target.value })}
+                    placeholder="Masih ada begitu banyak detik, tawa, dan cerita yang belum kita jalani bersama."
+                    className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100 resize-none font-sans"
+                  />
+                </div>
+
+                {/* Baris Footer: Dibuat dengan segenap cinta & Copyright */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-white/10">
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Teks Cinta Footer (Baris 1)
+                    </label>
+                    <input
+                      type="text"
+                      value={noteForm.final_footer_text}
+                      onChange={(e) => setNoteForm({ ...noteForm, final_footer_text: e.target.value })}
+                      placeholder="Dibuat dengan segenap cinta."
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                    <p className="text-[10px] text-warm-400/50 mt-1">
+                      Nama <strong>{settingsForm.couple_names || 'Wahyu & Nur'}</strong> akan otomatis diletakkan tepat di tengah di bawah kalimat ini.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-sans tracking-wider uppercase text-warm-300/70 mb-1">
+                      Tagline / Hak Cipta Footer (Baris 3)
+                    </label>
+                    <input
+                      type="text"
+                      value={noteForm.final_copyright}
+                      onChange={(e) => setNoteForm({ ...noteForm, final_copyright: e.target.value })}
+                      placeholder="Our Little Universe • Terukir selamanya di dalam hati kita"
+                      className="w-full px-3.5 py-2 rounded-lg bg-black/50 border border-white/10 text-xs text-warm-100"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1255,7 +1969,7 @@ export const AdminDashboardModal = () => {
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      <span>Simpan Surat Cinta</span>
+                      <span>Simpan Surat Cinta & Footer</span>
                     </>
                   )}
                 </button>
@@ -1264,7 +1978,7 @@ export const AdminDashboardModal = () => {
           )}
 
           {/* ============================================================== */}
-          {/* TAB 5: PIN & KEAMANAN */}
+          {/* TAB 6: PIN & KEAMANAN */}
           {/* ============================================================== */}
           {activeDashboardTab === 'security' && (
             <div className="space-y-6 max-w-xl mx-auto">
@@ -1272,7 +1986,7 @@ export const AdminDashboardModal = () => {
                 <div className="flex items-center gap-2.5 pb-2 border-b border-white/10">
                   <KeyRound className="w-4 h-4 text-champagne-400" />
                   <h3 className="font-serif text-base text-warm-50 font-normal">
-                    Ganti PIN Masuk Admin (admin_pin)
+                    Ganti PIN Masuk Admin
                   </h3>
                 </div>
 

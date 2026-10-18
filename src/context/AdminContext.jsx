@@ -3,6 +3,8 @@ import {
   getSiteSettings, 
   updateSiteSettings, 
   uploadHeroPhoto,
+  uploadStoryPhoto,
+  uploadTimelinePhoto,
   uploadBgMusic,
   getGalleryPhotos, 
   addGalleryPhoto, 
@@ -36,23 +38,54 @@ export const AdminProvider = ({ children }) => {
   // Modal display states
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
-  const [activeDashboardTab, setActiveDashboardTab] = useState('gallery'); // 'gallery' | 'settings' | 'timeline' | 'letter' | 'security'
+  const [activeDashboardTab, setActiveDashboardTab] = useState('gallery'); // 'gallery' | 'hero' | 'story' | 'timeline' | 'letter' | 'security'
   const [editTargetData, setEditTargetData] = useState(null);
 
-  // 2. Supabase Dynamic Data States
+  // 2. Supabase Dynamic Data States with complete default values
   const [siteSettings, setSiteSettings] = useState({
     couple_names: `${coupleConfig.partner1} & ${coupleConfig.partner2}`,
     relationship_start_date: coupleConfig.anniversaryDate === '0000-00-00' ? '2023-10-24' : coupleConfig.anniversaryDate,
+    hero_badge: coupleDataByLang.id.hero.badge,
     hero_title: coupleDataByLang.id.hero.title,
     hero_subtitle: coupleDataByLang.id.hero.subtitle,
     hero_image_url: coupleDataByLang.id.hero.mainImage,
+    hero_quote: coupleDataByLang.id.hero.quoteOverlay,
+    hero_caption: coupleDataByLang.id.hero.imageCaption,
     bg_music_url: coupleConfig.music.audioSrc,
     admin_pin: DEFAULT_ADMIN_PIN,
+
+    // Story Section (Section 01)
+    story_section_title: coupleDataByLang.id.story.sectionTitle,
+    story_subheading: coupleDataByLang.id.story.subheading,
+    story_chapter_tag: coupleDataByLang.id.story.chapterTag,
+    story_title: coupleDataByLang.id.story.title,
+    story_date: coupleDataByLang.id.story.date,
+    story_location: coupleDataByLang.id.story.location,
+    story_coordinates: coupleDataByLang.id.story.coordinates,
+    story_description: coupleDataByLang.id.story.description,
+    story_quote: coupleDataByLang.id.story.quote,
+    story_image1_url: coupleDataByLang.id.story.image1,
+    story_image1_caption: coupleDataByLang.id.story.image1Caption,
+    story_image2_url: coupleDataByLang.id.story.image2,
+    story_image2_caption: coupleDataByLang.id.story.image2Caption,
+
+    // Timeline Header
+    timeline_section_title: coupleDataByLang.id.timeline.sectionTitle,
+    timeline_subheading: coupleDataByLang.id.timeline.subheading,
+
+    // Final Section
+    final_quote: coupleDataByLang.id.final.quote,
+    final_subtext: coupleDataByLang.id.final.subtext,
+    final_button_text: coupleDataByLang.id.final.buttonText,
+    final_footer_text: coupleDataByLang.id.final.footerText,
+    final_copyright: coupleDataByLang.id.final.copyright,
   });
 
   const [galleryPhotos, setGalleryPhotos] = useState([]);
   const [timelineEvents, setTimelineEvents] = useState([]);
   const [loveNote, setLoveNote] = useState({
+    heading: coupleDataByLang.id.loveLetter.heading,
+    date: coupleDataByLang.id.loveLetter.date,
     letter_content: coupleDataByLang.id.loveLetter.paragraphs.join('\n\n'),
     signature_names: `${coupleConfig.partner1} & ${coupleConfig.partner2}`
   });
@@ -88,7 +121,10 @@ export const AdminProvider = ({ children }) => {
         }
 
         if (note) {
-          setLoveNote(note);
+          setLoveNote(prev => ({
+            ...prev,
+            ...note
+          }));
         }
       }
     } catch (err) {
@@ -162,6 +198,16 @@ export const AdminProvider = ({ children }) => {
     if (res?.publicUrl) {
       await saveSiteSettings({ hero_image_url: res.publicUrl });
     }
+    return res;
+  };
+
+  const uploadStory = async (file, slot = '1') => {
+    const res = await uploadStoryPhoto(file, slot);
+    return res;
+  };
+
+  const uploadTimeline = async (file) => {
+    const res = await uploadTimelinePhoto(file);
     return res;
   };
 
@@ -243,11 +289,13 @@ export const AdminProvider = ({ children }) => {
   };
 
   // 10. Love Note Update
-  const saveLoveNote = async ({ letter_content, signature_names }) => {
+  const saveLoveNote = async ({ letter_content, signature_names, heading, date }) => {
     try {
       const updated = await updateLoveNote({
         letter_content,
         signature_names,
+        heading,
+        date,
         id: loveNote?.id
       });
       setLoveNote(prev => ({ ...prev, ...updated }));
@@ -262,7 +310,15 @@ export const AdminProvider = ({ children }) => {
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
   const openDashboardModal = (tab = 'gallery', targetData = null) => {
-    setActiveDashboardTab(tab);
+    // Aliases for tabs
+    const validTabs = ['gallery', 'hero', 'settings', 'story', 'timeline', 'letter', 'security'];
+    let resolvedTab = tab;
+    if (tab === 'moments') resolvedTab = 'gallery';
+    if (tab === 'settings') resolvedTab = 'hero';
+    if (tab === 'story-final') resolvedTab = 'letter';
+    if (!validTabs.includes(resolvedTab)) resolvedTab = 'gallery';
+
+    setActiveDashboardTab(resolvedTab);
     setEditTargetData(targetData);
     setIsDashboardModalOpen(true);
   };
@@ -282,6 +338,8 @@ export const AdminProvider = ({ children }) => {
         siteSettings,
         saveSiteSettings,
         uploadHero,
+        uploadStory,
+        uploadTimeline,
         uploadAudio,
         galleryPhotos,
         addPhoto,

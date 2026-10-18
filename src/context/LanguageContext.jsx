@@ -5,15 +5,55 @@ import { useAdmin } from './AdminContext';
 const LanguageContext = createContext();
 
 export function mergeCoupleData(baseData, siteSettings, galleryPhotos, timelineEvents, loveNote) {
-  let merged = { ...baseData };
+  let merged = JSON.parse(JSON.stringify(baseData));
 
-  // 1. Site Settings Overrides (Hero, Titles, Music, Names)
+  // 1. Site Settings Overrides (Hero, Story, Final, Titles, Music, Names)
   if (siteSettings) {
+    // Hero Section Overrides
     merged.hero = {
       ...merged.hero,
+      badge: siteSettings.hero_badge || merged.hero.badge,
       title: siteSettings.hero_title || merged.hero.title,
       subtitle: siteSettings.hero_subtitle || merged.hero.subtitle,
       mainImage: siteSettings.hero_image_url || merged.hero.mainImage,
+      quoteOverlay: siteSettings.hero_quote || merged.hero.quoteOverlay,
+      imageCaption: siteSettings.hero_caption || merged.hero.imageCaption,
+    };
+
+    // Story Section (Section 01) Overrides
+    merged.story = {
+      ...merged.story,
+      sectionTitle: siteSettings.story_section_title || merged.story.sectionTitle,
+      subheading: siteSettings.story_subheading || merged.story.subheading,
+      chapterTag: siteSettings.story_chapter_tag || merged.story.chapterTag,
+      title: siteSettings.story_title || merged.story.title,
+      date: siteSettings.story_date || merged.story.date,
+      location: siteSettings.story_location || merged.story.location,
+      coordinates: siteSettings.story_coordinates || merged.story.coordinates,
+      description: siteSettings.story_description || merged.story.description,
+      quote: siteSettings.story_quote || merged.story.quote,
+      image1: siteSettings.story_image1_url || merged.story.image1,
+      image1Caption: siteSettings.story_image1_caption || merged.story.image1Caption,
+      image2: siteSettings.story_image2_url || merged.story.image2,
+      image2Caption: siteSettings.story_image2_caption || merged.story.image2Caption,
+    };
+
+    // Timeline Section Header Overrides
+    if (siteSettings.timeline_section_title) {
+      merged.timeline.sectionTitle = siteSettings.timeline_section_title;
+    }
+    if (siteSettings.timeline_subheading) {
+      merged.timeline.subheading = siteSettings.timeline_subheading;
+    }
+
+    // Final Section & Footer Overrides
+    merged.final = {
+      ...merged.final,
+      quote: siteSettings.final_quote || merged.final.quote,
+      subtext: siteSettings.final_subtext || merged.final.subtext,
+      buttonText: siteSettings.final_button_text || merged.final.buttonText,
+      footerText: siteSettings.final_footer_text || merged.final.footerText,
+      copyright: siteSettings.final_copyright || merged.final.copyright,
     };
   }
 
@@ -45,8 +85,8 @@ export function mergeCoupleData(baseData, siteSettings, galleryPhotos, timelineE
       description: item.description || '',
       location: item.location || '',
       tag: item.location ? item.location : `Babak ${index + 1}`,
-      // Fallback image from default list if needed
-      image: baseData.timeline?.milestones?.[index % (baseData.timeline?.milestones?.length || 1)]?.image || 
+      image: item.image_url || 
+             baseData.timeline?.milestones?.[index % (baseData.timeline?.milestones?.length || 1)]?.image || 
              'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1000&auto=format&fit=crop'
     }));
 
@@ -65,6 +105,8 @@ export function mergeCoupleData(baseData, siteSettings, galleryPhotos, timelineE
 
     merged.loveLetter = {
       ...merged.loveLetter,
+      heading: loveNote.heading || merged.loveLetter.heading,
+      date: loveNote.date || merged.loveLetter.date,
       paragraphs: paragraphs.length > 0 ? paragraphs : merged.loveLetter.paragraphs,
       signature: loveNote.signature_names || merged.loveLetter.signature
     };

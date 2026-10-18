@@ -58,11 +58,11 @@ export const StorySection = () => {
             {/* Admin Quick Edit Button */}
             {isAdmin && (
               <button
-                onClick={() => openDashboardModal('hero-story')}
-                className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-full glass-panel border border-champagne-400/50 text-champagne-300 text-xs font-medium tracking-wide flex items-center gap-1.5 shadow-lg hover:bg-champagne-400/20 transition-all opacity-80 hover:opacity-100"
-                title="Ganti Foto Kisah"
+                onClick={() => openDashboardModal('story')}
+                className="absolute top-4 right-4 z-20 px-3.5 py-1.5 rounded-full glass-panel border border-champagne-400/50 text-champagne-300 text-xs font-medium tracking-wide flex items-center gap-1.5 shadow-lg hover:bg-champagne-400/20 transition-all opacity-80 hover:opacity-100"
+                title="Edit Kisah & Foto"
               >
-                <span>✏️ Ganti Foto</span>
+                <span>✏️ Edit Kisah & Foto</span>
               </button>
             )}
 

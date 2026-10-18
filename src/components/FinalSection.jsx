@@ -75,20 +75,27 @@ export const FinalSection = () => {
         <div className="w-24 h-[1px] bg-white/10 my-16" />
 
         {/* Bottom Credits & Made with love */}
-        <div className="flex flex-col items-center space-y-2 text-center">
-          <p className="text-xs tracking-widest uppercase font-sans text-warm-300/60 flex items-center gap-2">
-            <span>{final.footerText}</span>
-            <span className="w-1 h-1 rounded-full bg-mutedrose-400" />
-            <span>{coupleConfig.partner1} & {coupleConfig.partner2}</span>
+        <div className="flex flex-col items-center space-y-3 text-center">
+          {/* Baris 1: Dibuat dengan segenap cinta */}
+          <p className="text-xs sm:text-sm tracking-widest uppercase font-sans text-warm-300/80">
+            {final.footerText || "Dibuat dengan segenap cinta."}
           </p>
-          <p className="text-[10px] tracking-mega-wide uppercase font-sans text-warm-400/30">
-            {final.copyright}
+
+          {/* Baris 2: Wahyu & Nur (Tepat di tengah di bawah kata-kata dibuat dengan segenap cinta) */}
+          <p className="font-editorial text-2xl sm:text-3xl text-champagne-300 tracking-wider">
+            {coupleConfig.coupleNames || `${coupleConfig.partner1} & ${coupleConfig.partner2}`}
           </p>
+
+          {/* Baris 3: Our Little Universe • Terukir selamanya di dalam hati kita */}
+          <p className="text-[10px] sm:text-xs tracking-mega-wide uppercase font-sans text-warm-400/50">
+            {final.copyright || "Our Little Universe • Terukir selamanya di dalam hati kita"}
+          </p>
+
           <button
-            onClick={isAdmin ? () => openDashboardModal('moments') : openLoginModal}
-            className="text-[10px] text-warm-400/30 hover:text-champagne-300/80 transition-colors pt-1 tracking-wider"
+            onClick={isAdmin ? () => openDashboardModal('letter') : openLoginModal}
+            className="text-[10px] text-warm-400/40 hover:text-champagne-300/80 transition-colors pt-2 tracking-wider inline-flex items-center gap-1.5"
           >
-            🔒 {isAdmin ? 'Panel Admin Foto' : 'Login Admin'}
+            🔒 {isAdmin ? 'Panel Kontrol Admin' : 'Login Admin'}
           </button>
         </div>
       </div>
